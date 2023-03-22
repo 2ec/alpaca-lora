@@ -30,7 +30,7 @@ BATCH_SIZE = 128
 GRADIENT_ACCUMULATION_STEPS = BATCH_SIZE // MICRO_BATCH_SIZE
 EPOCHS = 3  # we don't always need 3 tbh
 LEARNING_RATE = 3e-4  # the Karpathy constant
-CUTOFF_LEN = 145000  # 256 accounts for about 96% of the data
+CUTOFF_LEN = 256  # 256 accounts for about 96% of the data
 LORA_R = 8
 LORA_ALPHA = 16
 LORA_DROPOUT = 0.05
@@ -40,7 +40,8 @@ TARGET_MODULES = [
     "v_proj",
 ]
 IMAGE_MODEL = VGG16(weights="imagenet", include_top=False)
-DATA_PATH = "ImageCLEFmed-MEDVQA-GI-2023-Development-Dataset/med_vqa_imageid.json"
+# "ImageCLEFmed-MEDVQA-GI-2023-Development-Dataset/med_vqa_imageid.json"
+DATA_PATH = "TEST_small.json"
 IMAGE_PATH = "ImageCLEFmed-MEDVQA-GI-2023-Development-Dataset/images"
 OUTPUT_DIR = "lora-alpaca"
 GLOBAL_LAST_PROMPT = {"ImageID": "", "image_features": ""}
@@ -131,7 +132,7 @@ def tokenize(prompt):
 def generate_and_tokenize_prompt(data_point):
     # This function masks out the labels for the input,
     # so that our loss is computed only on the response.
-    input = get_image_features(data_point)
+    input = data_point["input"]  # get_image_features(data_point)
     user_prompt = (
         (
             f"""Below is a question that describes a task, paired with an input that provides further context. Write a response that appropriately answers the request.
