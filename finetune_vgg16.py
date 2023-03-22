@@ -27,7 +27,7 @@ BATCH_SIZE = 128
 GRADIENT_ACCUMULATION_STEPS = BATCH_SIZE // MICRO_BATCH_SIZE
 EPOCHS = 3  # we don't always need 3 tbh
 LEARNING_RATE = 3e-4  # the Karpathy constant
-CUTOFF_LEN = 256  # 256 accounts for about 96% of the data
+CUTOFF_LEN = 145000  # 256 accounts for about 96% of the data
 LORA_R = 8
 LORA_ALPHA = 16
 LORA_DROPOUT = 0.05
@@ -128,23 +128,23 @@ def generate_and_tokenize_prompt(data_point):
     input = get_image_features(data_point)
     user_prompt = (
         (
-            f"""Below is an instruction that describes a task, paired with an input that provides further context. Write a response that appropriately completes the request.
+            f"""Below is a question that describes a task, paired with an input that provides further context. Write a response that appropriately answers the request.
 
-### Instruction:
-{data_point["instruction"]}
+### Question:
+{data_point["Question"]}
 
-### Input:
+### Input image:
 {input}
 
-### Response:
+### Answer:
 """
         )
         if input
         else (
-            f"""Below is an instruction that describes a task. Write a response that appropriately completes the request.
+            f"""Below is an instruction that describes a task. Write a response that appropriately answers the request.
 
-### Instruction:
-{data_point["instruction"]}
+### Question:
+{data_point["Question"]}
 
 ### Response:
 """
@@ -161,7 +161,7 @@ def generate_and_tokenize_prompt(data_point):
         - 1
     )  # no eos token
     full_tokens = tokenizer(
-        user_prompt + data_point["output"],
+        user_prompt + data_point["Answer"],
         truncation=True,
         max_length=CUTOFF_LEN + 1,
         padding="max_length",
