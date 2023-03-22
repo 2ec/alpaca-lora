@@ -15,7 +15,7 @@ def preprocess_img(img_path: str) -> np.ndarray:
     return x
 
 
-def get_image_features(img_path: str, np_type: np.dtype) -> np.ndarray:
+def get_image_features(img_path: str, np_type: np.dtype = np.float16) -> np.ndarray:
     x = preprocess_img(img_path)
     features = model.predict(x)[0].astype(np_type)
     return features
