@@ -1,10 +1,8 @@
 import tensorflow as tf
-from tensorflow.keras.applications.vgg16 import VGG16, preprocess_input
+from tensorflow.keras.applications.vgg16 import preprocess_input
 from tensorflow.keras.preprocessing import image
 import numpy as np
 import json
-
-model = VGG16(weights="imagenet", include_top=False)
 
 
 def preprocess_img(img_path: str) -> np.ndarray:
@@ -15,7 +13,7 @@ def preprocess_img(img_path: str) -> np.ndarray:
     return x
 
 
-def get_image_features(img_path: str, np_type: np.dtype = np.float16) -> np.ndarray:
+def get_image_features(img_path: str, model, np_type: np.dtype = np.float16) -> np.ndarray:
     x = preprocess_img(img_path)
     features = model.predict(x)[0].astype(np_type)
     return features

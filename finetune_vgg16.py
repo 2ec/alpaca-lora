@@ -16,6 +16,9 @@ import transformers
 import alpaca_image_feature_extraction
 import numpy as np
 
+from tensorflow.keras.applications.vgg16 import VGG16
+
+
 assert (
     "LlamaTokenizer" in transformers._import_structure["models.llama"]
 ), "LLaMA is now in HuggingFace's main branch.\nPlease reinstall it: pip uninstall transformers && pip install git+https://github.com/huggingface/transformers.git"
@@ -36,6 +39,7 @@ TARGET_MODULES = [
     "q_proj",
     "v_proj",
 ]
+IMAGE_MODEL = VGG16(weights="imagenet", include_top=False)
 DATA_PATH = "ImageCLEFmed-MEDVQA-GI-2023-Development-Dataset/med_vqa_imageid.json"
 IMAGE_PATH = "ImageCLEFmed-MEDVQA-GI-2023-Development-Dataset/images"
 OUTPUT_DIR = "lora-alpaca"
@@ -76,7 +80,9 @@ def get_image_features(data_point):
     if data_point['ImageID'] != GLOBAL_LAST_PROMPT["ImageID"]:
         image_path = f"{IMAGE_PATH}/{data_point['ImageID']}.jpg"
         features = alpaca_image_feature_extraction.get_image_features(
-            img_path=image_path, np_type=np.float16).tolist()
+            img_path=image_path,
+            model=IMAGE_MODEL,
+            np_type=np.float16).tolist()
 
         GLOBAL_LAST_PROMPT["ImageID"] = data_point["ImageID"]
         GLOBAL_LAST_PROMPT["image_features"] = features
