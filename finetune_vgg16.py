@@ -79,8 +79,14 @@ data = load_dataset("json", data_files=DATA_PATH)
 
 def generate_prompt(data_point):
     # sorry about the formatting disaster gotta move fast
-    img_path = f"{IMAGE_PATH}/{data_point['input']}.jpg"
-    vgg16_img_features = alpaca_image_feature_extraction.get_image_features(img_path=img_path, model=IMAGE_MODEL, np_type=np.float16)
+    if GLOBAL_LAST_PROMPT["ImageID"] == data_point["input"]:
+        vgg16_img_features = GLOBAL_LAST_PROMPT["image_features"]
+    else:
+        img_path = f"{IMAGE_PATH}/{data_point['input']}.jpg"
+        vgg16_img_features = alpaca_image_feature_extraction.get_image_features(img_path=img_path, model=IMAGE_MODEL, np_type=np.float16)
+        GLOBAL_LAST_PROMPT["ImageID"] = data_point['input']
+        GLOBAL_LAST_PROMPT["image_features"] = vgg16_img_features
+        
     return f"""Below is an instruction that describes a task, paired with an input that provides further context. Write a response that appropriately completes the request.
 
 ### Instruction:
