@@ -12,7 +12,7 @@ tokenizer = LlamaTokenizer.from_pretrained("decapoda-research/llama-7b-hf")
 
 LOAD_8BIT = False
 BASE_MODEL = "decapoda-research/llama-7b-hf"
-LORA_WEIGHTS = input("Which path to weights. Press enter for default. :")
+LORA_WEIGHTS = input("\Press enter for default weights or enter path: ")
 
 if not LORA_WEIGHTS:
     LORA_WEIGHTS = "tloen/alpaca-lora-7b"
@@ -123,5 +123,5 @@ def evaluate(
     return output.split("### Response:")[1].strip()
 
 
-evaluate(instruction=input("Instruction: "), input=input("input: "))
+print(evaluate(instruction=input("\nEnter instruction: "), input=input("Enter optional input: ")))
 
