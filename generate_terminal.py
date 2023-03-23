@@ -123,8 +123,8 @@ def evaluate(
     output = tokenizer.decode(s)
     return output # output.split("### Response:")[1].strip()
 
-input_token = "start"
-while len(input_token) > 0:
+instruction = "start"
+while len(instruction) > 0:
     output = evaluate(instruction=input("\nEnter instruction: "), input=input("Enter optional input: "))
 
     print(f"\nResponse: {output.split('### Response:')[1].strip()}")
