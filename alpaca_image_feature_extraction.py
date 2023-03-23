@@ -2,7 +2,9 @@ from tensorflow.keras.applications.vgg16 import preprocess_input
 from tensorflow.keras.preprocessing import image
 import numpy as np
 import json
+import os
 
+os.environ["CUDA_VISIBLE_DEVICES"]="0,1"
 
 def preprocess_img(img_path: str) -> np.ndarray:
     img = image.load_img(img_path, target_size=(224, 224))
