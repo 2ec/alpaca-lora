@@ -125,7 +125,7 @@ def evaluate(
 
 while True:
     instruction=input("\nEnter instruction: ")
-    if len(instruction) > 0:
+    if len(instruction) < 0:
         print("Breaking free!")
         break
     input=input("Enter optional input: ")
