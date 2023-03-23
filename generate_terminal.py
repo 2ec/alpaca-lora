@@ -15,6 +15,7 @@ BASE_MODEL = "decapoda-research/llama-7b-hf"
 LORA_WEIGHTS = input("\nPress enter for default weights or enter path: ")
 
 if not LORA_WEIGHTS:
+    print("Loading default weights...")
     LORA_WEIGHTS = "tloen/alpaca-lora-7b"
 
 if torch.cuda.is_available():
@@ -122,8 +123,9 @@ def evaluate(
     output = tokenizer.decode(s)
     return output # output.split("### Response:")[1].strip()
 
+input_token = "start"
+while len(input_token) > 0:
+    output = evaluate(instruction=input("\nEnter instruction: "), input=input("Enter optional input: "))
 
-output = evaluate(instruction=input("\nEnter instruction: "), input=input("Enter optional input: "))
-
-print(f"\nResponse: {output.split('### Response:')[1].strip()}")
-print(f"\nWhole output string:\n{output}")
+    print(f"\nResponse: {output.split('### Response:')[1].strip()}")
+    print(f"\nWhole output string:\n{output}")
