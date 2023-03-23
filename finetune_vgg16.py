@@ -41,7 +41,7 @@ TARGET_MODULES = [
 ]
 IMAGE_MODEL = VGG16(weights="imagenet", include_top=False)
 # "ImageCLEFmed-MEDVQA-GI-2023-Development-Dataset/med_vqa_imageid.json"
-DATA_PATH = "TEST_small.json"
+DATA_PATH = "med_qa_imageid.json"
 IMAGE_PATH = "ImageCLEFmed-MEDVQA-GI-2023-Development-Dataset/images"
 OUTPUT_DIR = "lora-alpaca"
 GLOBAL_LAST_PROMPT = {"ImageID": "", "image_features": ""}
@@ -86,7 +86,7 @@ def generate_prompt(data_point):
         vgg16_img_features = alpaca_image_feature_extraction.get_image_features(img_path=img_path, model=IMAGE_MODEL, np_type=np.float16)
         GLOBAL_LAST_PROMPT["ImageID"] = data_point['input']
         GLOBAL_LAST_PROMPT["image_features"] = vgg16_img_features
-        
+
     return f"""Below is an instruction that describes a task, paired with an input that provides further context. Write a response that appropriately completes the request.
 
 ### Instruction:
