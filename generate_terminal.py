@@ -123,9 +123,13 @@ def evaluate(
     output = tokenizer.decode(s)
     return output # output.split("### Response:")[1].strip()
 
-instruction = "start"
-while len(instruction) > 0:
-    output = evaluate(instruction=input("\nEnter instruction: "), input=input("Enter optional input: "))
+while True:
+    instruction=input("\nEnter instruction: ")
+    if len(instruction) > 0:
+        print("Breaking free!")
+        break
+    input=input("Enter optional input: ")
+    output = evaluate(instruction, )
 
     print(f"\nResponse: {output.split('### Response:')[1].strip()}")
     print(f"\nWhole output string:\n{output}")
