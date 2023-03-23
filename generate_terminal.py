@@ -128,8 +128,11 @@ while True:
     if len(instruction) < 0:
         print("Breaking free!")
         break
-    input=input("Enter optional input: ")
-    output = evaluate(instruction, )
+    input_token = input("Enter optional input: ")
+    output = evaluate(instruction, input_token)
 
     print(f"\nResponse: {output.split('### Response:')[1].strip()}")
-    print(f"\nWhole output string:\n{output}")
+    
+    see_more = input("Do you want to see the whole output? y/n: ")
+    if see_more == "y":
+        print(f"\nWhole output string:\n{output}")
