@@ -20,7 +20,9 @@ def get_image_features(img_path: str, model, np_type: np.dtype = np.float16) -> 
     return features
 
 def get_image_top_n_classes(img_path:str, model, top_n_features:int=100) -> list:
+    print("\nImage path:", img_path)
     x = preprocess_img(img_path)
+    print(type(x))
     yhat = model.predict(x)
     labels = decode_predictions(yhat, top=top_n_features)
     labels = labels[0][:]
