@@ -34,12 +34,14 @@ CUTOFF_LEN = 145000 #256  # 256 accounts for about 96% of the data
 LORA_R = 8
 LORA_ALPHA = 16
 LORA_DROPOUT = 0.05
-VAL_SET_SIZE = 600  # 2000
+VAL_SET_SIZE = 11000 # 30% of the dataset  # 2000
 TARGET_MODULES = [
     "q_proj",
     "v_proj",
 ]
-IMAGE_MODEL = VGG16(weights="imagenet", include_top=False)
+# IMAGE_MODEL = VGG16(weights="imagenet", include_top=False)
+IMAGE_MODEL = VGG16(weights="imagenet", include_top=True, classes=1000, pooling=None)
+TOP_N_IMAGE_FEATURES = 100
 # "ImageCLEFmed-MEDVQA-GI-2023-Development-Dataset/med_vqa_imageid.json"
 DATA_PATH = "med_qa_imageid.json"
 IMAGE_PATH = "ImageCLEFmed-MEDVQA-GI-2023-Development-Dataset/images"
@@ -79,20 +81,20 @@ data = load_dataset("json", data_files=DATA_PATH)
 
 def generate_prompt(data_point):
     # sorry about the formatting disaster gotta move fast
-    if GLOBAL_LAST_PROMPT["ImageID"] == data_point["input"]:
-        vgg16_img_features = GLOBAL_LAST_PROMPT["image_features"]
-    else:
-        img_path = f"{IMAGE_PATH}/{data_point['input']}.jpg"
-        vgg16_img_features = alpaca_image_feature_extraction.get_image_features(img_path=img_path, model=IMAGE_MODEL, np_type=np.float16)
-        GLOBAL_LAST_PROMPT["ImageID"] = data_point['input']
-        GLOBAL_LAST_PROMPT["image_features"] = vgg16_img_features
+    # if GLOBAL_LAST_PROMPT["ImageID"] == data_point["input"]: # Checks if the image is the same as the last and don't compute new features if already done.
+    #     vgg16_img_features = GLOBAL_LAST_PROMPT["image_features"]
+    # else:
+    img_path = f"{IMAGE_PATH}/{data_point['input']}.jpg"
+    vgg16_img_features = alpaca_image_feature_extraction.get_image_top_n_classes(img_path=img_path, model=IMAGE_MODEL, top_n_features=TOP_N_IMAGE_FEATURES)
+    # GLOBAL_LAST_PROMPT["ImageID"] = data_point['input']
+    # GLOBAL_LAST_PROMPT["image_features"] = vgg16_img_features
 
-    return f"""Below is an instruction that describes a task, paired with an input that provides further context. Write a response that appropriately completes the request.
+    return f"""Below is an question that describes a task, paired with image featues that descirbes the top {TOP_N_IMAGE_FEATURES} image classes and their score. Write a response that appropriately answers the question usning the image information.
 
 ### Instruction:
 {data_point["instruction"]}
 
-### Input:
+### Image features:
 {vgg16_img_features}
 
 ### Response:
