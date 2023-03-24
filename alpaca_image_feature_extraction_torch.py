@@ -5,8 +5,8 @@ def get_image_top_n_classes(img_path:str, model, top_n_features:int=100) -> list
     prediction_list = get_image_predictions(img_path, model).tolist()
 
     new_list = []
-    for i, value in enumerate(prediction_list):
-        score = round(value, 3)
+    for i in len(prediction_list):
+        score = round(prediction[i].item()*100, 3)
         category_name = weights.meta["categories"][i]
         new_list.append((category_name, score))
 
