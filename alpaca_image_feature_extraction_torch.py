@@ -6,13 +6,12 @@ def get_image_top_n_classes(img_path:str, model, top_n_features:int=100) -> list
 
     new_list = []
     for i, value in enumerate(prediction_list):
-        score = value.item()
+        score = round(value, 3)
         category_name = weights.meta["categories"][i]
         new_list.append((category_name, score))
 
     new_list_sorted = sorted(new_list, key=lambda tup: tup[1], reverse=True)
     return new_list_sorted[:top_n_features]
-
 
 def get_image_predictions(img_path:str, model):
     img = read_image(img_path)
