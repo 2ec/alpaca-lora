@@ -8,15 +8,15 @@ from transformers import LlamaForCausalLM, LlamaTokenizer
 import os
 import sys
 
-import torch
 import torch.nn as nn
+from torchvision.models import vgg16, VGG16_Weights
 import bitsandbytes as bnb
 from datasets import load_dataset
 import transformers
-import alpaca_image_feature_extraction
+import alpaca_image_feature_extraction_torch
 import numpy as np
 
-from tensorflow.keras.applications.vgg16 import VGG16
+#from tensorflow.keras.applications.vgg16 import VGG16
 
 
 assert (
@@ -40,7 +40,10 @@ TARGET_MODULES = [
     "v_proj",
 ]
 # IMAGE_MODEL = VGG16(weights="imagenet", include_top=False)
-IMAGE_MODEL = VGG16(weights="imagenet", include_top=True, classes=1000, pooling=None)
+weights = VGG16_Weights.IMAGENET1K_V1
+IMAGE_MODEL = vgg16(weights=weights)
+IMAGE_MODEL.eval()
+#IMAGE_MODEL = VGG16(weights="imagenet", include_top=True, classes=1000, pooling=None)
 TOP_N_IMAGE_FEATURES = 100
 # "ImageCLEFmed-MEDVQA-GI-2023-Development-Dataset/med_vqa_imageid.json"
 DATA_PATH = "med_qa_imageid.json"
@@ -85,7 +88,7 @@ def generate_prompt(data_point):
     #     vgg16_img_features = GLOBAL_LAST_PROMPT["image_features"]
     # else:
     img_path = f"{IMAGE_PATH}/{data_point['input']}.jpg"
-    vgg16_img_features = alpaca_image_feature_extraction.get_image_top_n_classes(img_path=img_path, model=IMAGE_MODEL, top_n_features=TOP_N_IMAGE_FEATURES)
+    vgg16_img_features = alpaca_image_feature_extraction_torch.get_image_top_n_classes(img_path=img_path, model=IMAGE_MODEL, top_n_features=TOP_N_IMAGE_FEATURES)
     # GLOBAL_LAST_PROMPT["ImageID"] = data_point['input']
     # GLOBAL_LAST_PROMPT["image_features"] = vgg16_img_features
 

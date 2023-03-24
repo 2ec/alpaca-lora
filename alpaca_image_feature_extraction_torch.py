@@ -2,25 +2,26 @@ from torchvision.io import read_image
 from torchvision.models import vgg16, VGG16_Weights
 
 def get_image_top_n_classes(img_path:str, model, top_n_features:int=100) -> list:
-    predictions = get_image_predictions(img_path, model)
+    prediction_list = get_image_predictions(img_path, model).tolist()
 
-    prediction_list = prediction.tolist()
     new_list = []
     for i, value in enumerate(prediction_list):
-        score = prediction[i].item()
-        category_name = weights.meta["categories"][i]  
+        score = value.item()
+        category_name = weights.meta["categories"][i]
         new_list.append((category_name, score))
 
     new_list_sorted = sorted(new_list, key=lambda tup: tup[1], reverse=True)
     return new_list_sorted[:top_n_features]
-    
+
 
 def get_image_predictions(img_path:str, model):
+    img = read_image(img_path)
+
     # Step 2: Initialize the inference transforms
     preprocess = weights.transforms()
 
     # Step 3: Apply inference preprocessing transforms
-    batch = preprocess(img_path).unsqueeze(0)
+    batch = preprocess(img).unsqueeze(0)
 
     # Step 4: Use the model and print the predicted category
     predictions = model(batch).squeeze(0)
@@ -36,17 +37,17 @@ if __name__ == "__main__":
     NUM_TOP_CATEGORIES = 100
 
     img = "ImageCLEFmed-MEDVQA-GI-2023-Development-Dataset/images/cl8k2u1pm1dw7083203g1b7yv.jpg"
-    
+
     # Step 4: Use the model and print the predicted category
-    predictions = get_image_predictions(img_path=img, model=model, top_n_features=NUM_TOP_CATEGORIES)
-    
+    predictions = get_image_predictions(img_path=img, model=model)
+
     prediction = predictions.softmax(0)
     class_id = prediction.argmax().item()
     score = prediction[class_id].item()
     category_name = weights.meta["categories"][class_id]
     print(f"Top category: {category_name}: {100 * score:.1f}%")
 
-
     top_n_classes = get_image_top_n_classes(img_path=img, model=model, top_n_features=NUM_TOP_CATEGORIES)
-    
-    print(get_image_top_n_classes)
+
+    print(top_n_classes)
+
