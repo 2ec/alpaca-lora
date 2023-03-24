@@ -1,4 +1,4 @@
-from tensorflow.keras.applications.vgg16 import preprocess_input, decode_predictions
+from tensorflow.keras.applications.vgg16 import preprocess_input, decode_predictions, VGG16
 from tensorflow.keras.preprocessing import image
 import numpy as np
 import json
@@ -32,3 +32,12 @@ def feature_to_json(features: np.ndarray, save_path: str):
 
     with open(save_path, "w") as f:
         json.dump(features_list, f)
+
+
+if __name__ == "__main__":
+    image_path = "ImageCLEFmed-MEDVQA-GI-2023-Development-Dataset/images/cl8k2u1pm1dw7083203g1b7yv.jpg"
+    print(f"\nImage path: {image_path} \nLoading model...")
+    model = VGG16(weights="imagenet", include_top=True, classes=1000, pooling=None)
+    labels = get_image_top_n_classes(img_path=image_path, model=model)
+
+    print(f"\nTop 100 labels for iamge: \n{labels}")
