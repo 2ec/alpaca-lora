@@ -35,7 +35,7 @@ IMAGE_PATH = "ImageCLEFmed-MEDVQA-GI-2023-Development-Dataset/images"
 def train(
     # model/data params
     base_model: str = "decapoda-research/llama-7b-hf",  # the only required argument
-    data_path: str = "./alpaca_data_cleaned.json",
+    data_path: str = DATA_PATH,
     output_dir: str = "./lora-alpaca",
     # training hyperparams
     batch_size: int = 128,
