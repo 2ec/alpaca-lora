@@ -1,12 +1,13 @@
 from torchvision.io import read_image
 from torchvision.models import vgg16, VGG16_Weights
 
-def get_image_top_n_classes(img_path:str, model, top_n_features:int=100) -> list:
-    prediction_list = get_image_predictions(img_path, model).tolist()
+def get_image_top_n_classes(img_path:str, model, top_n_features:int=100, weights=VGG16_Weights.IMAGENET1K_V1) -> list:
+    predicted = get_image_predictions(img_path, model, weights)
+    predicted_softmax = predicted.softmax(0)
 
     new_list = []
-    for i in range(len(prediction_list)):
-        score = round(prediction[i].item()*100, 3)
+    for i in range(len(predicted_softmax)):
+        score = round(predicted_softmax[i].item()*100, 3)
         category_name = weights.meta["categories"][i]
         new_list.append((category_name, score))
 
