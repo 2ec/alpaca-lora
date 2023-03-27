@@ -194,6 +194,7 @@ def train(
             logging_steps=10,
             evaluation_strategy="steps" if val_set_size > 0 else "no",
             save_strategy="steps",
+            optim="adamw_torch",
             eval_steps=200 if val_set_size > 0 else None,
             save_steps=200,
             output_dir=output_dir,
