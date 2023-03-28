@@ -30,7 +30,7 @@ weights = VGG16_Weights.IMAGENET1K_V1
 IMAGE_MODEL = vgg16(weights=weights)
 IMAGE_MODEL.eval()
 TOP_N_IMAGE_FEATURES = 100
-DATA_PATH = "med_qa_imageid.json"
+DATA_PATH = "med_qa_imageid_5000.json"
 IMAGE_PATH = "ImageCLEFmed-MEDVQA-GI-2023-Development-Dataset/images"
 
 
@@ -45,7 +45,7 @@ def train(
     num_epochs: int = 3,
     learning_rate: float = 3e-4,
     cutoff_len: int = 1485,
-    val_set_size: int = 11000,
+    val_set_size: int = 1500,
     # lora hyperparams
     lora_r: int = 8,
     lora_alpha: int = 16,
