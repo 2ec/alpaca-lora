@@ -92,6 +92,7 @@ def train(
         base_model,
         load_in_8bit=True,
         device_map=device_map,
+        torch_dtype=torch.float16
     )
 
     tokenizer = LlamaTokenizer.from_pretrained(base_model)
