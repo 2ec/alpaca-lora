@@ -12,6 +12,8 @@ import transformers
 import alpaca_image_feature_extraction_torch
 import numpy as np
 
+os.environ["CUDA_VISIBLE_DEVICES"] = "1" 
+
 assert (
     "LlamaTokenizer" in transformers._import_structure["models.llama"]
 ), "LLaMA is now in HuggingFace's main branch.\nPlease reinstall it: pip uninstall transformers && pip install git+https://github.com/huggingface/transformers.git"
