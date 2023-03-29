@@ -230,7 +230,7 @@ def train(
 def generate_prompt(data_point):
     # sorry about the formatting disaster gotta move fast
     img_path = f"{IMAGE_PATH}/{data_point['input']}.jpg"
-    vgg16_img_features = alpaca_image_feature_extraction_torch.get_image_top_n_classes(img_path=img_path, model=IMAGE_MODEL, top_n_features=TOP_N_IMAGE_FEATURES)
+    vgg16_img_features = alpaca_image_feature_extraction_torch.get_image_top_n_classes(img=img_path, model=IMAGE_MODEL, top_n_features=TOP_N_IMAGE_FEATURES, from_path=True)
     return f"""Below is a question that describes a task, paired with an input that provides image features from an encoded image. The form of the image features are (label, probability). Write a response that appropriately completes the request.
 
 ### Question:
