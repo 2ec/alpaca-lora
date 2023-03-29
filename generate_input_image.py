@@ -95,10 +95,10 @@ def main(
         max_new_tokens=128,
         **kwargs,
     ):
-        
-        input_img_features = get_image_top_n_classes(input, model=IMG_MODEL, top_n_features=100, weights=IMG_WEIGHTS, from_path=False)
+        if input is not None:
+            input = get_image_top_n_classes(input, model=IMG_MODEL, top_n_features=100, weights=IMG_WEIGHTS, from_path=False)
 
-        prompt = generate_prompt(instruction, input_img_features)
+        prompt = generate_prompt(instruction, input)
         inputs = tokenizer(prompt, return_tensors="pt")
         input_ids = inputs["input_ids"].to(device)
         generation_config = GenerationConfig(
