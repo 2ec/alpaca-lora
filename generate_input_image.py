@@ -34,8 +34,8 @@ def main(
     ), "Please specify a --base_model, e.g. --base_model='decapoda-research/llama-7b-hf'"
 
     # Image Model:
-    WEIGHTS = VGG16_Weights.IMAGENET1K_V1
-    IMG_MODEL = vgg16(weights=WEIGHTS)
+    IMG_WEIGHTS = VGG16_Weights.IMAGENET1K_V1
+    IMG_MODEL = vgg16(weights=IMG_WEIGHTS)
 
 
     tokenizer = LlamaTokenizer.from_pretrained(base_model)
