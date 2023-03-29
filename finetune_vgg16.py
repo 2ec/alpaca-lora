@@ -40,12 +40,12 @@ def train(
     data_path: str = DATA_PATH,
     output_dir: str = "./lora-alpaca",
     # training hyperparams
-    batch_size: int = 128,
+    batch_size: int = 256,
     micro_batch_size: int = 4,
-    num_epochs: int = 3,
+    num_epochs: int = 4,
     learning_rate: float = 3e-4,
     cutoff_len: int = 1485,
-    val_set_size: int = 1500,
+    val_set_size: int = 6000,
     # lora hyperparams
     lora_r: int = 8,
     lora_alpha: int = 16,
