@@ -129,7 +129,7 @@ def main(
                 placeholder="Tell me about alpacas.",
             ),
             #gr.components.Textbox(lines=2, label="Input", placeholder="none"),
-            gr.Image(shape=(224, 224), type="pil", label="Input image"),
+            gr.Image(shape=(224, 224), type="pil", label="Input image", value=None),
             gr.components.Slider(
                 minimum=0, maximum=1, value=0.1, label="Temperature"
             ),
