@@ -1,8 +1,8 @@
 from torchvision.io import read_image
 from torchvision.models import vgg16, VGG16_Weights
 
-def get_image_top_n_classes(img_path:str, model, top_n_features:int=100, weights=VGG16_Weights.IMAGENET1K_V1) -> list:
-    predicted = get_image_predictions(img_path, model, weights)
+def get_image_top_n_classes(img_path:str, model, top_n_features:int=100, weights=VGG16_Weights.IMAGENET1K_V1, from_path=True) -> list:
+    predicted = get_image_predictions(img_path, model, weights, from_path)
     predicted_softmax = predicted.softmax(0)
 
     new_list = []
@@ -14,8 +14,9 @@ def get_image_top_n_classes(img_path:str, model, top_n_features:int=100, weights
     new_list_sorted = sorted(new_list, key=lambda tup: tup[1], reverse=True)
     return new_list_sorted[:top_n_features]
 
-def get_image_predictions(img_path:str, model, weights=VGG16_Weights.IMAGENET1K_V1):
-    img = read_image(img_path)
+def get_image_predictions(img_path:str, model, weights=VGG16_Weights.IMAGENET1K_V1, from_path=True):
+    if from_path:
+        img = read_image(img_path)
 
     # Step 2: Initialize the inference transforms
     preprocess = weights.transforms()

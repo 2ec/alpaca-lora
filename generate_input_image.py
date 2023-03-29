@@ -6,7 +6,8 @@ import torch
 import transformers
 from peft import PeftModel
 from transformers import GenerationConfig, LlamaForCausalLM, LlamaTokenizer
-from torchvision.io.image import decode_image
+from alpaca_img_feature_extraction_torch import get_image_top_n_classes
+from torchvision.models import vgg16, VGG16_Weights
 
 import torchvision.transforms as transforms
 
@@ -31,6 +32,11 @@ def main(
     assert (
         base_model
     ), "Please specify a --base_model, e.g. --base_model='decapoda-research/llama-7b-hf'"
+
+    # Image Model:
+    WEIGHTS = VGG16_Weights.IMAGENET1K_V1
+    IMG_MODEL = vgg16(weights=WEIGHTS)
+
 
     tokenizer = LlamaTokenizer.from_pretrained(base_model)
     if device == "cuda":
@@ -90,15 +96,9 @@ def main(
         **kwargs,
     ):
         
-        # Define a transform to convert PIL 
-        # image to a Torch tensor
-        transform = transforms.Compose([
-            transforms.PILToTensor()
-        ])
-        img_tensor = transform(input)
-        input_img = decode_image(img_tensor)
+        input_img_features = get_image_top_n_classes(input, model=IMG_MODEL, top_n_features=100, weights=IMG_WEIGHTS, from_path=False)
 
-        prompt = generate_prompt(instruction, input_img)
+        prompt = generate_prompt(instruction, input_img_features)
         inputs = tokenizer(prompt, return_tensors="pt")
         input_ids = inputs["input_ids"].to(device)
         generation_config = GenerationConfig(
