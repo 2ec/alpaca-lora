@@ -6,7 +6,7 @@ import torch
 import transformers
 from peft import PeftModel
 from transformers import GenerationConfig, LlamaForCausalLM, LlamaTokenizer
-from alpaca_img_feature_extraction_torch import get_image_top_n_classes
+from alpaca_image_feature_extraction_torch import get_image_top_n_classes
 from torchvision.models import vgg16, VGG16_Weights
 
 import torchvision.transforms as transforms
