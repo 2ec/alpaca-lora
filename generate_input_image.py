@@ -129,7 +129,7 @@ def main(
                 placeholder="Tell me about alpacas.",
             ),
             #gr.components.Textbox(lines=2, label="Input", placeholder="none"),
-            gr.Image(shape=(224, 224), label="Input image"),
+            gr.Image(shape=(224, 224), type="pil", label="Input image"),
             gr.components.Slider(
                 minimum=0, maximum=1, value=0.1, label="Temperature"
             ),
@@ -143,7 +143,7 @@ def main(
                 minimum=1, maximum=4, step=1, value=4, label="Beams"
             ),
             gr.components.Slider(
-                minimum=1, maximum=2000, step=1, value=128, label="Max tokens"
+                minimum=1, maximum=2000, step=1, value=1485, label="Max tokens"
             ),
         ],
         outputs=[
