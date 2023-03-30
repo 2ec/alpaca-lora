@@ -156,7 +156,7 @@ def train(
     if resume_from_checkpoint:
         # Check the available weights and load them
         checkpoint_name = os.path.join(
-            resume_from_checkpoint, "adapter_model.bin"
+            resume_from_checkpoint, "pytorch_model.bin"
         )  # Full checkpoint
         if not os.path.exists(checkpoint_name):
             checkpoint_name = os.path.join(
