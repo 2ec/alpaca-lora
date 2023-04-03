@@ -4,23 +4,23 @@ from typing import List
 
 import fire
 import torch
-from torchvision.models import vgg16, VGG16_Weights
-from datasets import load_dataset
 import transformers
-import alpaca_image_feature_extraction_torch
+from datasets import load_dataset
+from torchvision.models import VGG16_Weights, vgg16
 
+import alpaca_image_feature_extraction_torch
 
 assert (
     "LlamaTokenizer" in transformers._import_structure["models.llama"]
 ), "LLaMA is now in HuggingFace's main branch.\nPlease reinstall it: pip uninstall transformers && pip install git+https://github.com/huggingface/transformers.git"
-from transformers import LlamaForCausalLM, LlamaTokenizer
 from peft import (
-    prepare_model_for_int8_training,
     LoraConfig,
     get_peft_model,
     get_peft_model_state_dict,
+    prepare_model_for_int8_training,
     set_peft_model_state_dict,
 )
+from transformers import LlamaForCausalLM, LlamaTokenizer
 
 weights = VGG16_Weights.IMAGENET1K_V1
 IMAGE_MODEL = vgg16(weights=weights)
@@ -33,6 +33,7 @@ MAP_NUM_PROC = os.cpu_count()
 if torch.__version__ >= "2" and sys.platform != "win32":
     IMAGE_MODEL = torch.compile(IMAGE_MODEL)
 
+
 def train(
     # model/data params
     base_model: str = "decapoda-research/llama-7b-hf",  # the only required argument
@@ -44,7 +45,7 @@ def train(
     num_epochs: int = 3,
     learning_rate: float = 3e-4,
     cutoff_len: int = 1485,
-    val_set_size: int = 6000, # 30% of train set
+    val_set_size: int = 6000,  # 30% of train set
     # lora hyperparams
     lora_r: int = 8,
     lora_alpha: int = 16,
@@ -93,12 +94,14 @@ def train(
         base_model,
         load_in_8bit=True,
         device_map=device_map,
-        torch_dtype=torch.float16
+        torch_dtype=torch.float16,
     )
 
     tokenizer = LlamaTokenizer.from_pretrained(base_model)
 
-    tokenizer.pad_token_id = 0  # unk. we want this to be different from the eos token
+    tokenizer.pad_token_id = (
+        0  # unk. we want this to be different from the eos token
+    )
     tokenizer.padding_side = "left"  # Allow batched inference
 
     def tokenize(prompt, add_eos_token=True):
@@ -161,7 +164,9 @@ def train(
             checkpoint_name = os.path.join(
                 resume_from_checkpoint, "adapter_model.bin"
             )  # only LoRA model - LoRA config above has to fit
-            resume_from_checkpoint = False  # So the trainer won't try loading its state
+            resume_from_checkpoint = (
+                False  # So the trainer won't try loading its state
+            )
         # The two files above have a different name depending on how they were saved, but are actually the same.
         if os.path.exists(checkpoint_name):
             print(f"Restarting from {checkpoint_name}")
@@ -176,10 +181,22 @@ def train(
         train_val = data["train"].train_test_split(
             test_size=val_set_size, shuffle=True, seed=42
         )
-        train_data = train_val["train"].shuffle().map(generate_and_tokenize_prompt, num_proc=MAP_NUM_PROC)
-        val_data = train_val["test"].shuffle().map(generate_and_tokenize_prompt, num_proc=MAP_NUM_PROC)
+        train_data = (
+            train_val["train"]
+            .shuffle()
+            .map(generate_and_tokenize_prompt, num_proc=MAP_NUM_PROC)
+        )
+        val_data = (
+            train_val["test"]
+            .shuffle()
+            .map(generate_and_tokenize_prompt, num_proc=MAP_NUM_PROC)
+        )
     else:
-        train_data = data["train"].shuffle().map(generate_and_tokenize_prompt, num_proc=MAP_NUM_PROC)
+        train_data = (
+            data["train"]
+            .shuffle()
+            .map(generate_and_tokenize_prompt, num_proc=MAP_NUM_PROC)
+        )
         val_data = None
 
     trainer = transformers.Trainer(
@@ -214,7 +231,9 @@ def train(
 
     old_state_dict = model.state_dict
     model.state_dict = (
-        lambda self, *_, **__: get_peft_model_state_dict(self, old_state_dict())
+        lambda self, *_, **__: get_peft_model_state_dict(
+            self, old_state_dict()
+        )
     ).__get__(model, type(model))
 
     if torch.__version__ >= "2" and sys.platform != "win32":
@@ -224,13 +243,22 @@ def train(
 
     model.save_pretrained(output_dir)
 
-    print("\n If there's a warning about missing keys above, please disregard :)")
+    print(
+        "\n If there's a warning about missing keys above, please disregard :)"
+    )
 
 
 def generate_prompt(data_point):
     # sorry about the formatting disaster gotta move fast
     img_path = f"{IMAGE_PATH}/{data_point['input']}.jpg"
-    vgg16_img_features = alpaca_image_feature_extraction_torch.get_image_top_n_classes(img=img_path, model=IMAGE_MODEL, top_n_features=TOP_N_IMAGE_FEATURES, from_path=True)
+    vgg16_img_features = (
+        alpaca_image_feature_extraction_torch.get_image_top_n_classes(
+            img=img_path,
+            model=IMAGE_MODEL,
+            top_n_features=TOP_N_IMAGE_FEATURES,
+            from_path=True,
+        )
+    )
     return f"""Below is a question that describes a task, paired with an input that provides image features from an encoded image. The form of the image features are (label, probability). Write a response that appropriately completes the request.
 
 ### Question:
