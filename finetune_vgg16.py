@@ -28,7 +28,7 @@ IMAGE_MODEL.eval()
 TOP_N_IMAGE_FEATURES = 100
 DATA_PATH = "med_qa_imageid_5000.json"
 IMAGE_PATH = "ImageCLEFmed-MEDVQA-GI-2023-Development-Dataset/images"
-MAP_NUM_PROC = 28
+MAP_NUM_PROC = os.cpu_count()
 
 if torch.__version__ >= "2" and sys.platform != "win32":
     IMAGE_MODEL = torch.compile(IMAGE_MODEL)
