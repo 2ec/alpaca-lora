@@ -19,7 +19,7 @@ def get_image_predictions(img, model, weights=VGG16_Weights.IMAGENET1K_V1, from_
         img = read_image(img)
 
     # Step 2: Initialize the inference transforms
-    preprocess = weights.transforms()
+    preprocess = weights.transforms(antialias=True)
 
     # Step 3: Apply inference preprocessing transforms
     batch = preprocess(img).unsqueeze(0)
