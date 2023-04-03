@@ -4,15 +4,11 @@ from typing import List
 
 import fire
 import torch
-import torch.nn as nn
 from torchvision.models import vgg16, VGG16_Weights
-import bitsandbytes as bnb
 from datasets import load_dataset
 import transformers
 import alpaca_image_feature_extraction_torch
-import numpy as np
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "1" 
 
 assert (
     "LlamaTokenizer" in transformers._import_structure["models.llama"]
@@ -32,7 +28,10 @@ IMAGE_MODEL.eval()
 TOP_N_IMAGE_FEATURES = 100
 DATA_PATH = "med_qa_imageid_5000.json"
 IMAGE_PATH = "ImageCLEFmed-MEDVQA-GI-2023-Development-Dataset/images"
+MAP_NUM_PROC = 28
 
+if torch.__version__ >= "2" and sys.platform != "win32":
+    IMAGE_MODEL = torch.compile(IMAGE_MODEL)
 
 def train(
     # model/data params
@@ -41,11 +40,11 @@ def train(
     output_dir: str = "./lora-alpaca",
     # training hyperparams
     batch_size: int = 128,
-    micro_batch_size: int = 2,
+    micro_batch_size: int = 3,
     num_epochs: int = 3,
     learning_rate: float = 3e-4,
     cutoff_len: int = 1485,
-    val_set_size: int = 6000,
+    val_set_size: int = 6000, # 30% of train set
     # lora hyperparams
     lora_r: int = 8,
     lora_alpha: int = 16,
@@ -177,10 +176,10 @@ def train(
         train_val = data["train"].train_test_split(
             test_size=val_set_size, shuffle=True, seed=42
         )
-        train_data = train_val["train"].shuffle().map(generate_and_tokenize_prompt)
-        val_data = train_val["test"].shuffle().map(generate_and_tokenize_prompt)
+        train_data = train_val["train"].shuffle().map(generate_and_tokenize_prompt, num_proc=MAP_NUM_PROC)
+        val_data = train_val["test"].shuffle().map(generate_and_tokenize_prompt, num_proc=MAP_NUM_PROC)
     else:
-        train_data = data["train"].shuffle().map(generate_and_tokenize_prompt)
+        train_data = data["train"].shuffle().map(generate_and_tokenize_prompt, num_proc=MAP_NUM_PROC)
         val_data = None
 
     trainer = transformers.Trainer(
@@ -198,8 +197,8 @@ def train(
             evaluation_strategy="steps" if val_set_size > 0 else "no",
             save_strategy="steps",
             optim="adamw_torch",
-            eval_steps=100 if val_set_size > 0 else None,
-            save_steps=100,
+            eval_steps=200 if val_set_size > 0 else None,
+            save_steps=200,
             do_eval=True,
             output_dir=output_dir,
             save_total_limit=3,
