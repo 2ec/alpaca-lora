@@ -28,7 +28,7 @@ IMAGE_MODEL.eval()
 TOP_N_IMAGE_FEATURES = 100
 DATA_PATH = "med_qa_imageid_5000.json"
 IMAGE_PATH = "ImageCLEFmed-MEDVQA-GI-2023-Development-Dataset/images"
-MAP_NUM_PROC = os.cpu_count()
+MAP_NUM_PROC = 1 #os.cpu_count() # Seems to not work on compute cluster per now.
 
 if torch.__version__ >= "2" and sys.platform != "win32":
     IMAGE_MODEL = torch.compile(IMAGE_MODEL)
@@ -214,8 +214,8 @@ def train(
             evaluation_strategy="steps" if val_set_size > 0 else "no",
             save_strategy="steps",
             optim="adamw_torch",
-            eval_steps=200 if val_set_size > 0 else None,
-            save_steps=200,
+            eval_steps=20 if val_set_size > 0 else None,
+            save_steps=50,
             do_eval=True,
             output_dir=output_dir,
             save_total_limit=3,
