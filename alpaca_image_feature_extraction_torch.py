@@ -1,6 +1,6 @@
 from torchvision.io import read_image
 from torchvision.models import VGG16_Weights, vgg16
-from torchvision.models.detection import fasterrcnn_resnet50_fpn_v2, FasterRCNN_ResNet50_FPN_V2_Weights.DEFAULT
+from torchvision.models.detection import fasterrcnn_resnet50_fpn_v2, FasterRCNN_ResNet50_FPN_V2_Weights
 import pandas as pd
 
 
