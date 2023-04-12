@@ -1,6 +1,6 @@
 from torchvision.io import read_image
 from torchvision.models import VGG16_Weights, vgg16
-from torchvision.models.detection import fasterrcnn_resnet50_fpn_v2, FasterRCNN_ResNet50_FPN_V2_Weights
+from torchvision.models.detection import fasterrcnn_resnet50_fpn_v2, FasterRCNN_ResNet50_FPN_V2_Weights.DEFAULT
 import pandas as pd
 
 
@@ -41,7 +41,7 @@ def get_image_predictions(
     return predictions
 
 
-def get_image_predictions_faster_rcnn(img, model, weights=FasterRCNN_ResNet50_FPN_V2_Weights, from_path=True):
+def get_image_predictions_faster_rcnn(img, model, weights=FasterRCNN_ResNet50_FPN_V2_Weights.DEFAULT, from_path=True):
     if from_path:
         img = read_image(img)
 
@@ -59,7 +59,7 @@ def get_image_top_n_classes_faster_rcnn(
         img,
         model,
         top_n_features: int = 50,
-        weights=FasterRCNN_ResNet50_FPN_V2_Weights,
+        weights=FasterRCNN_ResNet50_FPN_V2_Weights.DEFAULT,
         from_path=True,
     ) -> list:
     prediction = get_image_predictions_faster_rcnn(img, model, weights, from_path)
@@ -84,7 +84,7 @@ def sort_list_of_scores(list:list, top_n_features:int) -> list:
 if __name__ == "__main__":
     # From https://pytorch.org/vision/stable/models.html#classification
     # Step 1: Initialize model with the best available weights
-    weights = FasterRCNN_ResNet50_FPN_V2_Weights
+    weights = FasterRCNN_ResNet50_FPN_V2_Weights.DEFAULT
     model = fasterrcnn_resnet50_fpn_v2(weights=weights, box_score_thresh=0.001)
 
     #weights = VGG16_Weights.IMAGENET1K_V1
@@ -95,4 +95,6 @@ if __name__ == "__main__":
     img = "ImageCLEFmed-MEDVQA-GI-2023-Development-Dataset/images/cl8k2u1pm1dw7083203g1b7yv.jpg"
 
     # Step 4: Use the model and print the predicted category
-    get_image_top_n_classes_faster_rcnn(img=img, model=model, top_n_features=50, weights=weights, from_path=True)
+    sorted_labels_scores = get_image_top_n_classes_faster_rcnn(img=img, model=model, top_n_features=50, weights=weights, from_path=True)
+    for i in sorted_labels_scores:
+        print(i)
