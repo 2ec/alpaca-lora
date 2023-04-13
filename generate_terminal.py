@@ -121,7 +121,7 @@ def evaluate(
         )
     s = generation_output.sequences[0]
     output = tokenizer.decode(s)
-    return output.split("### Response:")[1].strip()
+    return output
 
 while True:
     instruction=input("\nEnter instruction: ")
