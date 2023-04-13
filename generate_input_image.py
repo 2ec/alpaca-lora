@@ -3,13 +3,10 @@ import sys
 import fire
 import gradio as gr
 import torch
-import transformers
 from peft import PeftModel
 from transformers import GenerationConfig, LlamaForCausalLM, LlamaTokenizer
 from alpaca_image_feature_extraction_torch import get_image_top_n_classes
 from torchvision.models import vgg16, VGG16_Weights
-
-import torchvision.transforms as transforms
 
 if torch.cuda.is_available():
     device = "cuda"
