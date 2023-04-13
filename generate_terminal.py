@@ -147,10 +147,11 @@ while True:
 
     want_lime = input("Do you want LIME? y/n: ")
     if want_lime == "y":
+        num_features = input("How many features do you want in the explenation? Default is 10. ")
 
         # Explain predictions using LIME
-        exp = EXPLAINER.explain_instance(instruction, alpaca_predict_lime, num_features=10)
+        exp = EXPLAINER.explain_instance(instruction, alpaca_predict_lime, num_features=num_features)
         #exp.show_in_notebook()
         file_path = input("Input file path to save image: ")
-        
+
         exp.save_to_file(file_path)
