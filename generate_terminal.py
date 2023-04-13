@@ -17,7 +17,7 @@ LOAD_8BIT = False
 BASE_MODEL = "decapoda-research/llama-7b-hf"
 LORA_WEIGHTS = input("\nPress enter for default weights or enter path: ")
 # Set up LIME explainer
-EXPLAINER = lime.lime_text.LimeTextExplainer()
+EXPLAINER = lime.lime_text.LimeTextExplainer(verbose=True)
 
 if not LORA_WEIGHTS:
     print("Loading default weights...")
