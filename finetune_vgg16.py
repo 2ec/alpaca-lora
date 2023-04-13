@@ -33,7 +33,6 @@ MAP_NUM_PROC = 1 #os.cpu_count() # Seems to not work on compute cluster per now.
 if torch.__version__ >= "2" and sys.platform != "win32":
     IMAGE_MODEL = torch.compile(IMAGE_MODEL)
 
-
 def train(
     # model/data params
     base_model: str = "decapoda-research/llama-7b-hf",  # the only required argument
@@ -58,6 +57,7 @@ def train(
     train_on_inputs: bool = True,  # if False, masks out inputs in loss
     group_by_length: bool = False,  # faster, but produces an odd training loss curve,
     resume_from_checkpoint: str = None,  # either training checkpoint or final adapter
+    image_feature_extractor: str = "faster_rcnn"
 ):
     print(
         f"Training Alpaca-LoRA model with params:\n"
@@ -77,11 +77,25 @@ def train(
         f"train_on_inputs: {train_on_inputs}\n"
         f"group_by_length: {group_by_length}\n"
         f"resume_from_checkpoint: {resume_from_checkpoint}\n"
+        f"image_feature_extractor: {image_feature_extractor}\n"
     )
     assert (
         base_model
     ), "Please specify a --base_model, e.g. --base_model='decapoda-research/llama-7b-hf'"
     gradient_accumulation_steps = batch_size // micro_batch_size
+
+    # Choose image feature extraction method
+    implemented_image_feature_extractions = ["vgg16", "faster_rcnn"]
+    assert (image_feature_extractor in implemented_image_feature_extractions), f"Please choose one of the models: {implemented_image_feature_extractions}."
+
+    if image_feature_extractor == "vgg16":
+        image_feature_extractor_func = alpaca_image_feature_extraction_torch.get_image_top_n_classes
+        img_encoder_structure = "(label, probability)"
+    elif image_feature_extractor == "faster_rcnn":
+        image_feature_extractor_func =  alpaca_image_feature_extraction_torch.get_image_top_n_classes_faster_rcnn
+        img_encoder_structure = "(label, probability, coordinates(xmin,ymin,xmax,ymax))"
+    else:
+        raise NotImplementedError(f"Could not find the model {image_feature_extractor} in {implemented_image_feature_extractions}")
 
     device_map = "auto"
     world_size = int(os.environ.get("WORLD_SIZE", 1))
@@ -127,7 +141,7 @@ def train(
         return result
 
     def generate_and_tokenize_prompt(data_point):
-        full_prompt = generate_prompt(data_point)
+        full_prompt = generate_prompt(data_point, image_feature_extractor_func, img_encoder_structure)
         tokenized_full_prompt = tokenize(full_prompt)
         if not train_on_inputs:
             user_prompt = generate_prompt({**data_point, "output": ""})
@@ -248,24 +262,24 @@ def train(
     )
 
 
-def generate_prompt(data_point):
+def generate_prompt(data_point, image_feature_extractor_func, img_encoder_structure):
     # sorry about the formatting disaster gotta move fast
     img_path = f"{IMAGE_PATH}/{data_point['input']}.jpg"
-    vgg16_img_features = (
-        alpaca_image_feature_extraction_torch.get_image_top_n_classes(
+    img_features = (
+        image_feature_extractor_func(
             img=img_path,
             model=IMAGE_MODEL,
             top_n_features=TOP_N_IMAGE_FEATURES,
             from_path=True,
         )
     )
-    return f"""Below is a question that describes a task, paired with an input that provides image features from an encoded image. The form of the image features are (label, probability). Write a response that appropriately completes the request.
+    return f"""Below is a question that describes a task, paired with an input that provides image features from an encoded image. The form of the image features are {img_encoder_structure}. Write a response that appropriately completes the request.
 
 ### Question:
 {data_point["instruction"]}
 
-### Encoded image features on the form (label, probability):
-{vgg16_img_features}
+### Encoded image features on the form {img_encoder_structure}:
+{img_features}
 
 ### Answer:
 {data_point["output"]}"""
