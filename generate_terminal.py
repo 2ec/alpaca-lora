@@ -4,7 +4,8 @@ from peft import PeftModel
 import transformers
 import numpy as np
 import lime
-import lime.lime_text
+#import lime.lime_text
+from eli5.lime import TextExplainer
 
 assert (
     "LlamaTokenizer" in transformers._import_structure["models.llama"]
@@ -131,8 +132,23 @@ def evaluate(
 def alpaca_predict_lime(texts):
     return np.array([evaluate(instruction, input_token) for text in texts])
 
+def model_adapter(texts: List[str]) -> np.ndarray:
+    all_scores = []
+
+    for i in range(0, len(texts), 64):
+        text_batch = texts[i:i+64]
+        # use Llama encoder to tokenize text 
+        encoded_input = tokenizer(text_batch, return_tensors="pt")
+        # run the model
+        output = model(**encoded_input)
+        scores = output.scores[0].softmax(1).detach().cpu().numpy()
+        all_scores.extend(scores)
+    return np.array(all_scores)
+
 # Set up LIME explainer
-EXPLAINER = lime.lime_text.LimeTextExplainer(verbose=True)
+# EXPLAINER = lime.lime_text.LimeTextExplainer(verbose=True)
+te = TextExplainer(n_samples=5000, random_state=42)
+
 
 while True:
     instruction=input("\nEnter instruction. Press enter to exit. ")
@@ -153,14 +169,11 @@ while True:
 
     want_lime = input("Do you want LIME? y/n: ")
     if want_lime == "y":
-        num_features = input("How many features do you want in the explenation? Default is 10. ")
+        #num_features = input("How many features do you want in the explenation? Default is 10. ")
         # Explain predictions using LIME
-        exp = EXPLAINER.explain_instance(instruction, scores, num_features=num_features)
-        #exp.show_in_notebook()
-
-        
-        
-        file_path = input("Input file path to save image. End with .html ")
-
-  
-        exp.save_to_file(file_path)
+        #exp = EXPLAINER.explain_instance(instruction, scores, num_features=num_features)
+        #file_path = input("Input file path to save image. End with .html ")
+        #exp.save_to_file(file_path)
+        te.fit("""The restaurant was amazing, the quality of their 
+food was exceptional. The waiters were so polite.""", model_adapter)
+        te.explain_prediction(target_names=list(model.config.id2label.values()))
