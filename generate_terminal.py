@@ -125,7 +125,7 @@ def evaluate(
         )
     s = generation_output.sequences[0]
     output = tokenizer.decode(s)
-    scores = generation_output.scores[0].softmax(1).detach().numpy()
+    scores = generation_output.scores[0].softmax(1).detach().cpu().numpy()
     return output, scores
 
 def alpaca_predict_lime(texts):
