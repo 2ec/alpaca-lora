@@ -6,6 +6,7 @@ import numpy as np
 import lime
 #import lime.lime_text
 from eli5.lime import TextExplainer
+from typing import List
 
 assert (
     "LlamaTokenizer" in transformers._import_structure["models.llama"]
