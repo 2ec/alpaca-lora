@@ -126,7 +126,7 @@ def evaluate(
         )
     s = generation_output.sequences[0]
     output = tokenizer.decode(s)
-    return output
+    return output, s
 
 def alpaca_predict_lime(texts):
     return np.array([evaluate(instruction, input_token) for text in texts])
@@ -144,14 +144,14 @@ while True:
         print("Breaking free!")
         break
     input_token = input("Enter optional input: ")
-    output = evaluate(instruction, input_token)
+    output, s = evaluate(instruction, input_token)
     output_cleaned = output.split('### Response:')[1].strip()
 
     print(f"\nResponse: {output_cleaned}")
     
     see_more = input("Do you want to see the whole output? y/n: ")
     if see_more == "y":
-        print(f"\nWhole output string:\n{output}")
+        print(f"\nWhole output string:\n{output}\n\ns:\n{s}")
 
     want_lime = input("Do you want LIME? y/n: ")
     if want_lime == "y":
