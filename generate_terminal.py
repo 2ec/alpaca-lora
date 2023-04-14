@@ -4,7 +4,8 @@ from peft import PeftModel
 import transformers
 import numpy as np
 import lime
-import lime.lime_text
+#import lime.lime_text
+from transformers_interpret import QuestionAnsweringExplainer
 
 assert (
     "LlamaTokenizer" in transformers._import_structure["models.llama"]
@@ -16,8 +17,7 @@ tokenizer = LlamaTokenizer.from_pretrained("decapoda-research/llama-7b-hf")
 LOAD_8BIT = False
 BASE_MODEL = "decapoda-research/llama-7b-hf"
 LORA_WEIGHTS = input("\nPress enter for default weights or enter path: ")
-# Set up LIME explainer
-EXPLAINER = lime.lime_text.LimeTextExplainer(verbose=True)
+
 
 if not LORA_WEIGHTS:
     print("Loading default weights...")
@@ -131,6 +131,13 @@ def evaluate(
 def alpaca_predict_lime(texts):
     return np.array([evaluate(instruction, input_token) for text in texts])
 
+# Set up LIME explainer
+#EXPLAINER = lime.lime_text.LimeTextExplainer(verbose=True)
+qa_explainer = QuestionAnsweringExplainer(
+    model,
+    tokenizer,
+)
+
 while True:
     instruction=input("\nEnter instruction. Press enter to exit. ")
     if len(instruction) <= 0:
@@ -138,8 +145,9 @@ while True:
         break
     input_token = input("Enter optional input: ")
     output = evaluate(instruction, input_token)
+    output_cleaned = output.split('### Response:')[1].strip()
 
-    print(f"\nResponse: {output.split('### Response:')[1].strip()}")
+    print(f"\nResponse: {output_cleaned}")
     
     see_more = input("Do you want to see the whole output? y/n: ")
     if see_more == "y":
@@ -147,11 +155,17 @@ while True:
 
     want_lime = input("Do you want LIME? y/n: ")
     if want_lime == "y":
-        num_features = input("How many features do you want in the explenation? Default is 10. ")
-
+        #num_features = input("How many features do you want in the explenation? Default is 10. ")
         # Explain predictions using LIME
-        exp = EXPLAINER.explain_instance(instruction, alpaca_predict_lime, num_features=num_features)
+        #exp = EXPLAINER.explain_instance(instruction, alpaca_predict_lime, num_features=num_features)
         #exp.show_in_notebook()
-        file_path = input("Input file path to save image: ")
 
-        exp.save_to_file(file_path)
+        word_attributions = qa_explainer(
+            f"{instruction} {input_token}",
+            output_cleaned,
+        )
+        print(qa_explainer.predicted_answer)
+        file_path = input("Input file path to save image. End with .html ")
+
+        qa_explainer.visualize(file_path)
+        #exp.save_to_file(file_path)
