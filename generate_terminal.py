@@ -4,8 +4,7 @@ from peft import PeftModel
 import transformers
 import numpy as np
 import lime
-#import lime.lime_text
-from transformers_interpret import QuestionAnsweringExplainer
+import lime.lime_text
 
 assert (
     "LlamaTokenizer" in transformers._import_structure["models.llama"]
@@ -126,18 +125,14 @@ def evaluate(
         )
     s = generation_output.sequences[0]
     output = tokenizer.decode(s)
-    scores = generation_output.scores
+    scores = generation_output[0].softmax(1).detach().numpy()
     return output, scores
 
 def alpaca_predict_lime(texts):
     return np.array([evaluate(instruction, input_token) for text in texts])
 
 # Set up LIME explainer
-#EXPLAINER = lime.lime_text.LimeTextExplainer(verbose=True)
-qa_explainer = QuestionAnsweringExplainer(
-    model,
-    tokenizer,
-)
+EXPLAINER = lime.lime_text.LimeTextExplainer(verbose=True)
 
 while True:
     instruction=input("\nEnter instruction. Press enter to exit. ")
@@ -145,7 +140,7 @@ while True:
         print("Breaking free!")
         break
     input_token = input("Enter optional input: ")
-    output, s = evaluate(instruction, input_token)
+    output, scores = evaluate(instruction, input_token)
     output_cleaned = output.split('### Response:')[1].strip()
 
     print(f"\nResponse: {output_cleaned}")
@@ -156,17 +151,14 @@ while True:
 
     want_lime = input("Do you want LIME? y/n: ")
     if want_lime == "y":
-        #num_features = input("How many features do you want in the explenation? Default is 10. ")
+        num_features = input("How many features do you want in the explenation? Default is 10. ")
         # Explain predictions using LIME
-        #exp = EXPLAINER.explain_instance(instruction, alpaca_predict_lime, num_features=num_features)
+        exp = EXPLAINER.explain_instance(instruction, scores, num_features=num_features)
         #exp.show_in_notebook()
 
-        word_attributions = qa_explainer(
-            f"{instruction} {input_token}",
-            output_cleaned,
-        )
-        print(qa_explainer.predicted_answer)
+        
+        
         file_path = input("Input file path to save image. End with .html ")
 
-        qa_explainer.visualize(file_path)
-        #exp.save_to_file(file_path)
+  
+        exp.save_to_file(file_path)
