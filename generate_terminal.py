@@ -145,6 +145,8 @@ while True:
 
     print(f"\nResponse: {output_cleaned}")
     
+    print(f"\nScores:\nType{type(scores)}\nShape: {scores.shape}\nScores: {scores}")
+
     see_more = input("Do you want to see the whole output? y/n: ")
     if see_more == "y":
         print(f"\nWhole output string:\n{output}\n\ns:\n{s}")
