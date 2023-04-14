@@ -126,7 +126,8 @@ def evaluate(
         )
     s = generation_output.sequences[0]
     output = tokenizer.decode(s)
-    return output, s
+    scores = generation_output.scores
+    return output, scores
 
 def alpaca_predict_lime(texts):
     return np.array([evaluate(instruction, input_token) for text in texts])
