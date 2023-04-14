@@ -1,11 +1,12 @@
 import sys
 import torch
+import torch.nn.functional as F
 from peft import PeftModel
 import transformers
 import numpy as np
 import lime
-#import lime.lime_text
-from eli5.lime import TextExplainer
+from lime.lime_text import LimeTextExplainer
+#from eli5.lime import TextExplainer
 from typing import List
 
 assert (
@@ -147,9 +148,13 @@ def model_adapter(texts: List[str]) -> np.ndarray:
     return np.array(all_scores)
 
 # Set up LIME explainer
-# EXPLAINER = lime.lime_text.LimeTextExplainer(verbose=True)
-te = TextExplainer(n_samples=5000, random_state=42)
+EXPLAINER = LimeTextExplainer(verbose=True)
+#te = TextExplainer(n_samples=5000, random_state=42)
 
+def predictor(texts):
+    outputs = model(**tokenizer(texts, return_tensors="pt", padding=True))
+    probas = F.softmax(outputs.logits).detach().numpy()
+    return probas
 
 while True:
     instruction=input("\nEnter instruction. Press enter to exit. ")
@@ -172,9 +177,5 @@ while True:
     if want_lime == "y":
         #num_features = input("How many features do you want in the explenation? Default is 10. ")
         # Explain predictions using LIME
-        #exp = EXPLAINER.explain_instance(instruction, scores, num_features=num_features)
-        #file_path = input("Input file path to save image. End with .html ")
-        #exp.save_to_file(file_path)
-        te.fit("""The restaurant was amazing, the quality of their 
-food was exceptional. The waiters were so polite.""", model_adapter)
-        te.explain_prediction(target_names=list(model.config.id2label.values()))
+        exp = EXPLAINER.explain_instance(output_cleaned, predictor, num_features=20, num_samples=2000)
+        save_path = input("Where do you want to save the image? Whole path, including .html ")
