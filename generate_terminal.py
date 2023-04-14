@@ -152,7 +152,7 @@ EXPLAINER = LimeTextExplainer(verbose=True)
 #te = TextExplainer(n_samples=5000, random_state=42)
 
 def predictor(texts):
-    outputs = model(**tokenizer(texts, return_tensors="pt", padding=True))
+    outputs = model(**tokenizer(texts, return_tensors="pt"))
     probas = F.softmax(outputs.logits).detach().numpy()
     return probas
 
