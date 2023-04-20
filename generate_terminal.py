@@ -132,6 +132,11 @@ def evaluate(
     return output, scores
 
 def alpaca_predict_lime(texts):
+    scores = []
+    for text in texts:
+        output, score = evaluate(text)
+        
+    
     return np.array([evaluate(instruction, input_token) for text in texts])
 
 def model_adapter(texts: List[str]) -> np.ndarray:
@@ -142,8 +147,20 @@ def model_adapter(texts: List[str]) -> np.ndarray:
         # use Llama encoder to tokenize text 
         encoded_input = tokenizer(text_batch, return_tensors="pt")
         # run the model
-        output = model(**encoded_input)
-        scores = output.scores[0].softmax(1).detach().cpu().numpy()
+        input_ids = encoded_input["input_ids"].to(device)
+       
+        with torch.no_grad():
+            generation_output = model.generate(
+                input_ids=input_ids,
+                generation_config=generation_config,
+                return_dict_in_generate=True,
+                output_scores=True,
+                max_new_tokens=max_new_tokens,
+            )
+        s = generation_output.sequences[0]
+        output = tokenizer.decode(s)
+        scores = generation_output.scores[0].softmax(1).detach().cpu().numpy()
+        #scores = output.scores[0].softmax(1).detach().cpu().numpy()
         all_scores.extend(scores)
     return np.array(all_scores)
 
