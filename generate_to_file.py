@@ -78,7 +78,7 @@ else:
     )
 
 
-def generate_prompt(data_point, image_feature_extractor_func, img_encoder_structure):
+def generate_prompt(data_point, image_feature_extractor_func, img_encoder_structure="(label, probability)"):
     # sorry about the formatting disaster gotta move fast
     img_path = f"{IMAGE_PATH}/{data_point['input']}.jpg"
     img_features = (
