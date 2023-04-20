@@ -160,9 +160,12 @@ def main():
         #output_cleaned = output.split('### Response:')[1].strip()
         question_answer["output_answered"] = answer
         question_answer["input"] = img_features
-        append_result(question_answer, new_answered_file_path)
+        append_result(question_answer, NEW_ANSWERED_FILE_PATH)
 
         
 
 if __name__ == "__main__":
     main()
+    # adapter_config.json
+    # '/lora-alpaca/20_5/adapter_config.json
+    # lora-alpaca/20_5/adapter_config.json
