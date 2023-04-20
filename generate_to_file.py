@@ -78,8 +78,10 @@ else:
     )
 
 
-def generate_prompt(data_point, image_feature_extractor_func, img_encoder_structure="(label, probability)"):
+def generate_prompt(data_point, image_feature_extractor_func=alpaca_image_feature_extraction_torch.get_image_top_n_classes, img_encoder_structure="(label, probability)"):
     # sorry about the formatting disaster gotta move fast
+    instruction, input = data_point["instruction"], data_point["input"]
+    
     img_path = f"{IMAGE_PATH}/{data_point['input']}.jpg"
     img_features = (
         image_feature_extractor_func(
@@ -97,8 +99,7 @@ def generate_prompt(data_point, image_feature_extractor_func, img_encoder_struct
 ### Encoded image features on the form {img_encoder_structure}:
 {img_features}
 
-### Answer:
-{data_point["output"]}""", img_features, data_point["output"]
+### Response:""", img_features, data_point["output"]
 
 if not LOAD_8BIT:
     model.half()  # seems to fix bugs for some users.
@@ -118,7 +119,7 @@ def evaluate(
     max_new_tokens=256,
     **kwargs,
 ):
-    prompt, img_features, answer = generate_prompt(instruction, input)
+    prompt, img_features, correct_answer = generate_prompt(instruction, input)
     inputs = tokenizer(prompt, return_tensors="pt")
     input_ids = inputs["input_ids"].to(device)
     generation_config = GenerationConfig(
@@ -139,7 +140,7 @@ def evaluate(
     s = generation_output.sequences[0]
     output = tokenizer.decode(s)
     scores = generation_output.scores[0].softmax(1).detach().cpu().numpy()
-    return output, scores, img_features, answer
+    return output, scores, img_features, correct_answer
 
 
 def main():
@@ -155,10 +156,9 @@ def main():
     parsed = json.loads(content)
 
     for question_answer in parsed:
-        instruction, input = question_answer["instruction"], question_answer["input"]
-        _, _, img_features, answer = evaluate(instruction, input)
-        #output_cleaned = output.split('### Response:')[1].strip()
-        question_answer["output_answered"] = answer
+        output, scores, img_features, answer = evaluate(question_answer)
+        output_cleaned = output.split('### Response:')[1].strip()
+        question_answer["output_answered"] = output_cleaned
         question_answer["input"] = img_features
         append_result(question_answer, NEW_ANSWERED_FILE_PATH)
 
