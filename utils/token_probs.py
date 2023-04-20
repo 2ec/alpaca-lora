@@ -1,6 +1,6 @@
 import numpy as np
 
-def print_token_probs(generation_output_sequences):
+def print_token_probs(generation_output):
     """
     Computes the transition scores of sequences given the generation scores 
     (and beam indices, if beam search was used). This is a convenient method 
@@ -41,4 +41,4 @@ def print_token_probs(generation_output_sequences):
     return token_scores
 
 
-token_scores = print_token_probs(generation_output.sequences)
+token_scores = print_token_probs(generation_output)
