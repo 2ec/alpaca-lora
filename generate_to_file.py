@@ -20,7 +20,7 @@ BASE_MODEL = "decapoda-research/llama-7b-hf"
 LORA_WEIGHTS = input("\nPress enter for default weights or enter path: ")
 NEW_ANSWERED_FILE_PATH = input("\nGive relative path to save resulting json.\nIf nothing is inputed, 'results/med_qa_imageid_5000_test_answered.json' is chosen: ")
 if not NEW_ANSWERED_FILE_PATH:
-    NEW_ANSWERED_FILE_PATH = "ImageCLEFmed-MEDVQA-GI-2023-Development-Dataset/images"
+    NEW_ANSWERED_FILE_PATH = "results/med_qa_imageid_5000_test_answered.json"
 
 
 weights = VGG16_Weights.IMAGENET1K_V1
