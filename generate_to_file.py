@@ -78,13 +78,13 @@ else:
     )
 
 
-def generate_prompt(data_point, image_feature_extractor_func=get_image_top_n_classes, img_encoder_structure="(label, probability)"):
+def generate_prompt(data_point, img_encoder_structure="(label, probability)"):
     # sorry about the formatting disaster gotta move fast
     instruction, input = data_point["instruction"], data_point["input"]
     
     img_path = f"{IMAGE_PATH}/{data_point['input']}.jpg"
     img_features = (
-        image_feature_extractor_func(
+        get_image_top_n_classes(
             img=img_path,
             model=IMAGE_MODEL,
             top_n_features=TOP_N_IMAGE_FEATURES,
@@ -110,7 +110,7 @@ if torch.__version__ >= "2" and sys.platform != "win32":
 
 
 def evaluate(
-    instruction,
+    data_point,
     input=None,
     temperature=0.1,
     top_p=0.75,
@@ -119,7 +119,7 @@ def evaluate(
     max_new_tokens=256,
     **kwargs,
 ):
-    prompt, img_features, correct_answer = generate_prompt(instruction, input)
+    prompt, img_features, correct_answer = generate_prompt(data_point)
     inputs = tokenizer(prompt, return_tensors="pt")
     input_ids = inputs["input_ids"].to(device)
     generation_config = GenerationConfig(
