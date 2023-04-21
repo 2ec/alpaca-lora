@@ -1,4 +1,5 @@
 import sys
+import os
 import torch
 import torch.nn.functional as F
 from peft import PeftModel
@@ -20,7 +21,9 @@ BASE_MODEL = "decapoda-research/llama-7b-hf"
 LORA_WEIGHTS = input("\nPress enter for default weights or enter path: ")
 NEW_ANSWERED_FILE_PATH = input("\nGive relative path to save resulting json.\nIf nothing is inputed, 'results/med_qa_imageid_5000_test_answered.json' is chosen: ")
 if not NEW_ANSWERED_FILE_PATH:
-    NEW_ANSWERED_FILE_PATH = "results/med_qa_imageid_5000_test_answered.json"
+    script_dir = os.path.dirname(__file__) #<-- absolute dir the script is in
+    rel_path = "results/med_qa_imageid_5000_test_answered.json"
+    NEW_ANSWERED_FILE_PATH = os.path.join(script_dir, rel_path)
 
 
 weights = VGG16_Weights.IMAGENET1K_V1
