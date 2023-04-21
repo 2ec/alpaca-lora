@@ -6,7 +6,7 @@ import transformers
 import json
 from torchvision.models import VGG16_Weights, vgg16
 
-import alpaca_image_feature_extraction_torch
+from alpaca_image_feature_extraction_torch import get_image_top_n_classes
 
 assert (
     "LlamaTokenizer" in transformers._import_structure["models.llama"]
@@ -78,7 +78,7 @@ else:
     )
 
 
-def generate_prompt(data_point, image_feature_extractor_func=alpaca_image_feature_extraction_torch.get_image_top_n_classes, img_encoder_structure="(label, probability)"):
+def generate_prompt(data_point, image_feature_extractor_func=get_image_top_n_classes, img_encoder_structure="(label, probability)"):
     # sorry about the formatting disaster gotta move fast
     instruction, input = data_point["instruction"], data_point["input"]
     
