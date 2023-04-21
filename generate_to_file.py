@@ -18,6 +18,9 @@ tokenizer = LlamaTokenizer.from_pretrained("decapoda-research/llama-7b-hf")
 LOAD_8BIT = False
 BASE_MODEL = "decapoda-research/llama-7b-hf"
 LORA_WEIGHTS = input("\nPress enter for default weights or enter path: ")
+NEW_ANSWERED_FILE_PATH = input("\nGive relative path to save resulting json.\nIf nothing is inputed, 'results/med_qa_imageid_5000_test_answered.json' is chosen: ")
+if NEW_ANSWERED_FILE_PATH is None:
+    NEW_ANSWERED_FILE_PATH = "ImageCLEFmed-MEDVQA-GI-2023-Development-Dataset/images"
 
 
 weights = VGG16_Weights.IMAGENET1K_V1
@@ -26,7 +29,7 @@ IMAGE_MODEL.eval()
 TOP_N_IMAGE_FEATURES = 100
 DATA_PATH = "ImageCLEFmed-MEDVQA-GI-2023-Development-Dataset/med_qa_imageid_without_not_relevant_5000_test.json"
 IMAGE_PATH = "ImageCLEFmed-MEDVQA-GI-2023-Development-Dataset/images"
-NEW_ANSWERED_FILE_PATH = "results/med_qa_imageid_5000_test_answered.json"
+
 
 if not LORA_WEIGHTS:
     print("Loading default weights...")
@@ -145,7 +148,7 @@ def evaluate(
 
 def main():
     def append_result(content_dict, file_path):
-        with open(file_path, "a") as f:
+        with open(file_path, "a+") as f:
             fs = str(content_dict).replace("'",'"')
             f.write(f"\t{fs},\n")
     
