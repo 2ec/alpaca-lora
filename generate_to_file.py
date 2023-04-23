@@ -30,7 +30,10 @@ weights = VGG16_Weights.IMAGENET1K_V1
 IMAGE_MODEL = vgg16(weights=weights)
 IMAGE_MODEL.eval()
 TOP_N_IMAGE_FEATURES = 100
-DATA_PATH = "ImageCLEFmed-MEDVQA-GI-2023-Development-Dataset/med_qa_imageid_without_not_relevant_5000_test.json"
+
+DATA_PATH = input("\nGive relative path to save resulting json.\nIf nothing is inputed, 'ImageCLEFmed-MEDVQA-GI-2023-Development-Dataset/med_qa_imageid_without_not_relevant_5000_test.json' is chosen: ")
+if not DATA_PATH:
+    DATA_PATH = "ImageCLEFmed-MEDVQA-GI-2023-Development-Dataset/med_qa_imageid_without_not_relevant_5000_test.json"
 IMAGE_PATH = "ImageCLEFmed-MEDVQA-GI-2023-Development-Dataset/images"
 
 
