@@ -172,9 +172,11 @@ def main():
         output_cleaned = output.split('### Response:')[1].strip()
         question_answer["output_answered"] = output_cleaned
         question_answer["input"] = img_features
+        question_answer_list.append(question_answer)
         
         if len(question_answer_list) == 20:
             append_result(question_answer_list, NEW_ANSWERED_FILE_PATH)
+            question_answer_list.clear()
 
         
 
