@@ -1,0 +1,75 @@
+
+===================================BUG REPORT===================================
+Welcome to bitsandbytes. For bug reports, please submit your error trace to: https://github.com/TimDettmers/bitsandbytes/issues
+================================================================================
+Training Alpaca-LoRA model with params:
+base_model: decapoda-research/llama-7b-hf
+data_path: ImageCLEFmed-MEDVQA-GI-2023-Development-Dataset/med_qa_imageid_without_not_relevant_20000.json
+output_dir: ./lora-alpaca/20_5
+batch_size: 128
+micro_batch_size: 3
+num_epochs: 3
+learning_rate: 0.0003
+cutoff_len: 1485
+val_set_size: 6000
+lora_r: 8
+lora_alpha: 16
+lora_dropout: 0.05
+lora_target_modules: ['q_proj', 'v_proj']
+train_on_inputs: True
+group_by_length: False
+resume_from_checkpoint: None
+
+trainable params: 4194304 || all params: 6742609920 || trainable%: 0.06220594176090199
+{'loss': 1.3015, 'learning_rate': 2.9999999999999997e-05, 'epoch': 0.09}
+{'loss': 1.2893, 'learning_rate': 5.9999999999999995e-05, 'epoch': 0.18}
+{'eval_loss': 1.2734591960906982, 'eval_runtime': 1333.3587, 'eval_samples_per_second': 4.5, 'eval_steps_per_second': 0.562, 'epoch': 0.18}
+{'loss': 1.2445, 'learning_rate': 8.999999999999999e-05, 'epoch': 0.27}
+{'loss': 1.1505, 'learning_rate': 0.00011999999999999999, 'epoch': 0.36}
+{'eval_loss': 1.072575330734253, 'eval_runtime': 1331.0079, 'eval_samples_per_second': 4.508, 'eval_steps_per_second': 0.563, 'epoch': 0.36}
+{'loss': 0.9828, 'learning_rate': 0.00015, 'epoch': 0.45}
+{'loss': 0.8349, 'learning_rate': 0.00017999999999999998, 'epoch': 0.54}
+{'eval_loss': 0.794089674949646, 'eval_runtime': 1318.9232, 'eval_samples_per_second': 4.549, 'eval_steps_per_second': 0.569, 'epoch': 0.54}
+{'loss': 0.7631, 'learning_rate': 0.00020999999999999998, 'epoch': 0.63}
+{'loss': 0.7191, 'learning_rate': 0.00023999999999999998, 'epoch': 0.72}
+{'eval_loss': 0.7060397267341614, 'eval_runtime': 1326.5378, 'eval_samples_per_second': 4.523, 'eval_steps_per_second': 0.565, 'epoch': 0.72}
+{'loss': 0.6972, 'learning_rate': 0.00027, 'epoch': 0.81}
+{'loss': 0.6856, 'learning_rate': 0.0003, 'epoch': 0.9}
+{'eval_loss': 0.6776627898216248, 'eval_runtime': 1333.5843, 'eval_samples_per_second': 4.499, 'eval_steps_per_second': 0.562, 'epoch': 0.9}
+{'loss': 0.6752, 'learning_rate': 0.0002871244635193133, 'epoch': 0.99}
+{'loss': 0.6636, 'learning_rate': 0.0002742489270386266, 'epoch': 1.08}
+{'eval_loss': 0.660502552986145, 'eval_runtime': 1323.0955, 'eval_samples_per_second': 4.535, 'eval_steps_per_second': 0.567, 'epoch': 1.08}
+{'loss': 0.661, 'learning_rate': 0.00026137339055793985, 'epoch': 1.17}
+{'loss': 0.6528, 'learning_rate': 0.0002484978540772532, 'epoch': 1.26}
+{'eval_loss': 0.649737536907196, 'eval_runtime': 1325.0022, 'eval_samples_per_second': 4.528, 'eval_steps_per_second': 0.566, 'epoch': 1.26}
+{'loss': 0.6461, 'learning_rate': 0.0002356223175965665, 'epoch': 1.35}
+{'loss': 0.6451, 'learning_rate': 0.0002227467811158798, 'epoch': 1.44}
+{'eval_loss': 0.6411390900611877, 'eval_runtime': 1330.9694, 'eval_samples_per_second': 4.508, 'eval_steps_per_second': 0.563, 'epoch': 1.44}
+{'loss': 0.6404, 'learning_rate': 0.00020987124463519314, 'epoch': 1.53}
+{'loss': 0.6375, 'learning_rate': 0.0001969957081545064, 'epoch': 1.62}
+{'eval_loss': 0.6341851949691772, 'eval_runtime': 1326.8315, 'eval_samples_per_second': 4.522, 'eval_steps_per_second': 0.565, 'epoch': 1.62}
+{'loss': 0.633, 'learning_rate': 0.0001841201716738197, 'epoch': 1.71}
+{'loss': 0.6331, 'learning_rate': 0.00017124463519313304, 'epoch': 1.8}
+{'eval_loss': 0.6288906335830688, 'eval_runtime': 1322.7867, 'eval_samples_per_second': 4.536, 'eval_steps_per_second': 0.567, 'epoch': 1.8}
+{'loss': 0.6262, 'learning_rate': 0.00015836909871244634, 'epoch': 1.89}
+{'loss': 0.6248, 'learning_rate': 0.00014549356223175964, 'epoch': 1.98}
+{'eval_loss': 0.624149739742279, 'eval_runtime': 1334.6496, 'eval_samples_per_second': 4.496, 'eval_steps_per_second': 0.562, 'epoch': 1.98}
+{'loss': 0.6215, 'learning_rate': 0.00013261802575107294, 'epoch': 2.07}
+{'loss': 0.62, 'learning_rate': 0.00011974248927038626, 'epoch': 2.16}
+{'eval_loss': 0.6199892163276672, 'eval_runtime': 1328.0262, 'eval_samples_per_second': 4.518, 'eval_steps_per_second': 0.565, 'epoch': 2.16}
+{'loss': 0.6183, 'learning_rate': 0.00010686695278969956, 'epoch': 2.25}
+{'loss': 0.618, 'learning_rate': 9.399141630901287e-05, 'epoch': 2.34}
+{'eval_loss': 0.6168615818023682, 'eval_runtime': 1343.8062, 'eval_samples_per_second': 4.465, 'eval_steps_per_second': 0.558, 'epoch': 2.34}
+{'loss': 0.6175, 'learning_rate': 8.111587982832617e-05, 'epoch': 2.43}
+{'loss': 0.6141, 'learning_rate': 6.824034334763947e-05, 'epoch': 2.52}
+{'eval_loss': 0.6140470504760742, 'eval_runtime': 1342.1761, 'eval_samples_per_second': 4.47, 'eval_steps_per_second': 0.559, 'epoch': 2.52}
+{'loss': 0.6151, 'learning_rate': 5.536480686695279e-05, 'epoch': 2.61}
+{'loss': 0.6127, 'learning_rate': 4.248927038626609e-05, 'epoch': 2.7}
+{'eval_loss': 0.6121785640716553, 'eval_runtime': 1328.2443, 'eval_samples_per_second': 4.517, 'eval_steps_per_second': 0.565, 'epoch': 2.7}
+{'loss': 0.6128, 'learning_rate': 2.9613733905579395e-05, 'epoch': 2.79}
+{'loss': 0.6113, 'learning_rate': 1.6738197424892702e-05, 'epoch': 2.88}
+{'eval_loss': 0.6109169125556946, 'eval_runtime': 1323.0373, 'eval_samples_per_second': 4.535, 'eval_steps_per_second': 0.567, 'epoch': 2.88}
+{'loss': 0.6096, 'learning_rate': 3.862660944206008e-06, 'epoch': 2.97}
+{'train_runtime': 56258.0507, 'train_samples_per_second': 0.747, 'train_steps_per_second': 0.006, 'train_loss': 0.7316008093836788, 'epoch': 3.0}
+
+ If there's a warning about missing keys above, please disregard :)
