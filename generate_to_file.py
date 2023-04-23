@@ -153,10 +153,11 @@ def evaluate(
 
 
 def main():
-    def append_result(content_dict, file_path):
+    def append_result(question_answer_list, file_path):
         with open(file_path, "a+") as f:
-            fs = str(content_dict).replace("'",'"')
-            f.write(f"\t{fs},\n")
+            for content_dict in question_answer_list:
+                fs = str(content_dict).replace("'",'"')
+                f.write(f"\t{fs},\n")
     
 
     with open(DATA_PATH, "r") as f:
@@ -164,12 +165,16 @@ def main():
 
     parsed = json.loads(content)
 
+    question_answer_list = []
+
     for question_answer in parsed:
         output, scores, img_features, answer = evaluate(question_answer)
         output_cleaned = output.split('### Response:')[1].strip()
         question_answer["output_answered"] = output_cleaned
         question_answer["input"] = img_features
-        append_result(question_answer, NEW_ANSWERED_FILE_PATH)
+        
+        if len(question_answer_list) == 20:
+            append_result(question_answer_list, NEW_ANSWERED_FILE_PATH)
 
         
 
