@@ -46,6 +46,11 @@ def train(
     # llm hyperparams
     train_on_inputs: bool = True,  # if False, masks out inputs in loss
     group_by_length: bool = False,  # faster, but produces an odd training loss curve,
+    # wandb params
+    wandb_project: str = "",
+    wandb_run_name: str = "",
+    wandb_watch: str = "",  # options: false | gradients | all
+    wandb_log_model: str = "",  # options: false | true
     resume_from_checkpoint: str = None,  # either training checkpoint or final adapter
 ):
     print(
@@ -66,6 +71,10 @@ def train(
         f"train_on_inputs: {train_on_inputs}\n"
         f"group_by_length: {group_by_length}\n"
         f"resume_from_checkpoint: {resume_from_checkpoint}\n"
+        f"wandb_project: {wandb_project}\n"
+        f"wandb_run_name: {wandb_run_name}\n"
+        f"wandb_watch: {wandb_watch}\n"
+        f"wandb_log_model: {wandb_log_model}\n"
     )
     assert (
         base_model
@@ -82,11 +91,24 @@ def train(
         device_map = {"": int(os.environ.get("LOCAL_RANK") or 0)}
         gradient_accumulation_steps = gradient_accumulation_steps // world_size
 
+    
+    # Check if parameter passed or if set within environ
+    use_wandb = len(wandb_project) > 0 or (
+        "WANDB_PROJECT" in os.environ and len(os.environ["WANDB_PROJECT"]) > 0
+    )
+    # Only overwrite environ if wandb param passed
+    if len(wandb_project) > 0:
+        os.environ["WANDB_PROJECT"] = wandb_project
+    if len(wandb_watch) > 0:
+        os.environ["WANDB_WATCH"] = wandb_watch
+    if len(wandb_log_model) > 0:
+        os.environ["WANDB_LOG_MODEL"] = wandb_log_model
+
     model = LlamaForCausalLM.from_pretrained(
         base_model,
         load_in_8bit=True,
-        device_map=device_map,
         torch_dtype=torch.float16,
+        device_map=device_map,
     )
 
     tokenizer = LlamaTokenizer.from_pretrained(base_model)
@@ -230,7 +252,9 @@ def train(
             load_best_model_at_end=True if val_set_size > 0 else False,
             ddp_find_unused_parameters=False if ddp else None,
             group_by_length=group_by_length,
-            torch_compile=True
+            torch_compile=True,
+            report_to="wandb" if use_wandb else None,
+            run_name=wandb_run_name if use_wandb else None,
         ),
         data_collator=transformers.DataCollatorForSeq2Seq(
             tokenizer, pad_to_multiple_of=8, return_tensors="pt", padding=True
