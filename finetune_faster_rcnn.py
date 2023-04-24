@@ -21,7 +21,6 @@ from transformers import LlamaForCausalLM, LlamaTokenizer
 
 
 DATA_PATH = "ImageCLEFmed-MEDVQA-GI-2023-Development-Dataset/med_qa_imageid_without_not_relevant_20000_with_faster_rcnn_features.json"
-IMAGE_PATH = "ImageCLEFmed-MEDVQA-GI-2023-Development-Dataset/images"
 MAP_NUM_PROC = 1 #os.cpu_count() # Seems to not work on compute cluster per now.
 
 def train(
@@ -75,8 +74,6 @@ def train(
     
     img_encoder_structure = "(label, probability, coordinates(xmin,ymin,xmax,ymax))"
   
-    if torch.__version__ >= "2" and sys.platform != "win32":
-        IMAGE_MODEL = torch.compile(IMAGE_MODEL)
 
     device_map = "auto"
     world_size = int(os.environ.get("WORLD_SIZE", 1))
