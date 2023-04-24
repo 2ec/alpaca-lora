@@ -2,7 +2,7 @@ from torchvision.io import read_image
 from torchvision.models import VGG16_Weights, vgg16
 from torchvision.models.detection import fasterrcnn_resnet50_fpn_v2, FasterRCNN_ResNet50_FPN_V2_Weights
 import pandas as pd
-
+from operator import itemgetter
 
 def get_image_top_n_classes(
     img,
@@ -66,7 +66,7 @@ def get_image_top_n_classes_faster_rcnn(
 
     labels_scores = []
 
-    print(f"\nType of prediction scores: \n{type(prediction['scores'])}\nPrediction Scores: \n{prediction['scores']}")
+    # print(f"\nType of prediction scores: \n{type(prediction['scores'])}\nPrediction Scores: \n{prediction['scores']}")
     for i, score in enumerate(prediction["scores"]):
         label = weights.meta["categories"][prediction["labels"][i]]
         xmin, ymin, xmax, ymax = prediction["boxes"][i].detach().tolist()
@@ -77,6 +77,11 @@ def get_image_top_n_classes_faster_rcnn(
     return sorted_labels_scores
 
 def sort_list_of_scores(list:list, top_n_features:int) -> list:
+    return sorted(list, key=itemgetter(2))[:top_n_features]
+
+def sort_list_of_scores_pd(list:list, top_n_features:int) -> list:
+    # print("\nSorting")
+    
     df = pd.DataFrame(list, columns=["label", "score", "coordinates"])
     df.sort_values(by=["score"], ascending=False, inplace=True)
     return df.loc[:top_n_features].values.tolist()
