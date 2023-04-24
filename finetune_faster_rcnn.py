@@ -75,7 +75,7 @@ def train(
     img_encoder_structure = "(label, probability, coordinates(xmin,ymin,xmax,ymax))"
   
 
-    device_map = "auto"
+    device_map = "cuda"
     world_size = int(os.environ.get("WORLD_SIZE", 1))
     ddp = world_size != 1
     if ddp:
