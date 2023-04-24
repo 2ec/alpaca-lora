@@ -85,7 +85,8 @@ def train(
     implemented_image_feature_extractions = ["vgg16", "faster_rcnn"]
     assert (image_feature_extractor in implemented_image_feature_extractions), f"Please choose one of the models: {implemented_image_feature_extractions}."
 
-    IMAGE_MODEL = None
+    global IMAGE_MODEL
+    global TOP_N_IMAGE_FEATURES
     global TOP_N_IMAGE_FEATURES
     if image_feature_extractor == "vgg16":
         print("\nLoading VGG16 pretrained on ImageNet and 100 top image features.")
@@ -275,22 +276,22 @@ def train(
     )
 
 
-def generate_prompt(data_point, image_feature_extractor_func, img_encoder_structure):
-    global IMAGE_PATH
-    global IMAGE_MODEL
-    global TOP_N_IMAGE_FEATURES
-    # sorry about the formatting disaster gotta move fast
-    img_path = f"{IMAGE_PATH}/{data_point['input']}.jpg"
-    
-    img_features = (
-        image_feature_extractor_func(
-            img=img_path,
-            model=IMAGE_MODEL,
-            top_n_features=TOP_N_IMAGE_FEATURES,
-            from_path=True,
+    def generate_prompt(data_point, image_feature_extractor_func, img_encoder_structure):
+        global IMAGE_PATH
+        global IMAGE_MODEL
+        global TOP_N_IMAGE_FEATURES
+        # sorry about the formatting disaster gotta move fast
+        img_path = f"{IMAGE_PATH}/{data_point['input']}.jpg"
+        
+        img_features = (
+            image_feature_extractor_func(
+                img=img_path,
+                model=IMAGE_MODEL,
+                top_n_features=TOP_N_IMAGE_FEATURES,
+                from_path=True,
+            )
         )
-    )
-    return f"""Below is a question that describes a task, paired with an input that provides image features from an encoded image. The form of the image features are {img_encoder_structure}. Write a response that appropriately completes the request.
+        return f"""Below is a question that describes a task, paired with an input that provides image features from an encoded image. The form of the image features are {img_encoder_structure}. Write a response that appropriately completes the request.
 
 ### Question:
 {data_point["instruction"]}
