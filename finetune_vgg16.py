@@ -154,6 +154,34 @@ def train(
 
         return result
 
+
+    def generate_prompt(data_point, image_feature_extractor_func, img_encoder_structure):
+        global IMAGE_PATH
+        global IMAGE_MODEL
+        global TOP_N_IMAGE_FEATURES
+        # sorry about the formatting disaster gotta move fast
+        img_path = f"{IMAGE_PATH}/{data_point['input']}.jpg"
+        
+        img_features = (
+            image_feature_extractor_func(
+                img=img_path,
+                model=IMAGE_MODEL,
+                top_n_features=TOP_N_IMAGE_FEATURES,
+                from_path=True,
+            )
+        )
+        return f"""Below is a question that describes a task, paired with an input that provides image features from an encoded image. The form of the image features are {img_encoder_structure}. Write a response that appropriately completes the request.
+
+### Question:
+{data_point["instruction"]}
+
+### Encoded image features on the form {img_encoder_structure}:
+{img_features}
+
+### Answer:
+{data_point["output"]}"""
+
+
     def generate_and_tokenize_prompt(data_point):
         full_prompt = generate_prompt(data_point, image_feature_extractor_func, img_encoder_structure)
         tokenized_full_prompt = tokenize(full_prompt)
@@ -275,33 +303,6 @@ def train(
     print(
         "\n If there's a warning about missing keys above, please disregard :)"
     )
-
-
-    def generate_prompt(data_point, image_feature_extractor_func, img_encoder_structure):
-        global IMAGE_PATH
-        global IMAGE_MODEL
-        global TOP_N_IMAGE_FEATURES
-        # sorry about the formatting disaster gotta move fast
-        img_path = f"{IMAGE_PATH}/{data_point['input']}.jpg"
-        
-        img_features = (
-            image_feature_extractor_func(
-                img=img_path,
-                model=IMAGE_MODEL,
-                top_n_features=TOP_N_IMAGE_FEATURES,
-                from_path=True,
-            )
-        )
-        return f"""Below is a question that describes a task, paired with an input that provides image features from an encoded image. The form of the image features are {img_encoder_structure}. Write a response that appropriately completes the request.
-
-### Question:
-{data_point["instruction"]}
-
-### Encoded image features on the form {img_encoder_structure}:
-{img_features}
-
-### Answer:
-{data_point["output"]}"""
 
 
 if __name__ == "__main__":
