@@ -7,12 +7,13 @@ import torch
 import transformers
 from datasets import load_dataset
 from torchvision.models import VGG16_Weights, vgg16
+from torchvision.models.detection import fasterrcnn_resnet50_fpn_v2, FasterRCNN_ResNet50_FPN_V2_Weights
 
 import alpaca_image_feature_extraction_torch
 
-assert (
-    "LlamaTokenizer" in transformers._import_structure["models.llama"]
-), "LLaMA is now in HuggingFace's main branch.\nPlease reinstall it: pip uninstall transformers && pip install git+https://github.com/huggingface/transformers.git"
+# assert (
+#     "LlamaTokenizer" in transformers._import_structure["models.llama"]
+# ), "LLaMA is now in HuggingFace's main branch.\nPlease reinstall it: pip uninstall transformers && pip install git+https://github.com/huggingface/transformers.git"
 from peft import (
     LoraConfig,
     get_peft_model,
@@ -22,16 +23,12 @@ from peft import (
 )
 from transformers import LlamaForCausalLM, LlamaTokenizer
 
-weights = VGG16_Weights.IMAGENET1K_V1
-IMAGE_MODEL = vgg16(weights=weights)
-IMAGE_MODEL.eval()
-TOP_N_IMAGE_FEATURES = 100
+
 DATA_PATH = "med_qa_imageid_5000.json"
 IMAGE_PATH = "ImageCLEFmed-MEDVQA-GI-2023-Development-Dataset/images"
 MAP_NUM_PROC = 1 #os.cpu_count() # Seems to not work on compute cluster per now.
-
-if torch.__version__ >= "2" and sys.platform != "win32":
-    IMAGE_MODEL = torch.compile(IMAGE_MODEL)
+global TOP_N_IMAGE_FEATURES
+global IMAGE_MODEL
 
 def train(
     # model/data params
@@ -88,14 +85,30 @@ def train(
     implemented_image_feature_extractions = ["vgg16", "faster_rcnn"]
     assert (image_feature_extractor in implemented_image_feature_extractions), f"Please choose one of the models: {implemented_image_feature_extractions}."
 
+    IMAGE_MODEL = None
+    global TOP_N_IMAGE_FEATURES
     if image_feature_extractor == "vgg16":
+        print("\nLoading VGG16 pretrained on ImageNet and 100 top image features.")
+        weights = VGG16_Weights.IMAGENET1K_V1
+        IMAGE_MODEL = vgg16(weights=weights)
+        IMAGE_MODEL.eval()
+        TOP_N_IMAGE_FEATURES = 100
         image_feature_extractor_func = alpaca_image_feature_extraction_torch.get_image_top_n_classes
         img_encoder_structure = "(label, probability)"
     elif image_feature_extractor == "faster_rcnn":
+        print("\nLoading Faster RCNN pretrained on COCO and 50 top image features.")
+        weights = FasterRCNN_ResNet50_FPN_V2_Weights.DEFAULT
+        IMAGE_MODEL = fasterrcnn_resnet50_fpn_v2(weights=weights, box_score_thresh=0.001)
+        IMAGE_MODEL.eval()
+        TOP_N_IMAGE_FEATURES = 50
+        
         image_feature_extractor_func =  alpaca_image_feature_extraction_torch.get_image_top_n_classes_faster_rcnn
         img_encoder_structure = "(label, probability, coordinates(xmin,ymin,xmax,ymax))"
     else:
         raise NotImplementedError(f"Could not find the model {image_feature_extractor} in {implemented_image_feature_extractions}")
+
+    if torch.__version__ >= "2" and sys.platform != "win32":
+        IMAGE_MODEL = torch.compile(IMAGE_MODEL)
 
     device_map = "auto"
     world_size = int(os.environ.get("WORLD_SIZE", 1))
@@ -265,6 +278,7 @@ def train(
 def generate_prompt(data_point, image_feature_extractor_func, img_encoder_structure):
     # sorry about the formatting disaster gotta move fast
     img_path = f"{IMAGE_PATH}/{data_point['input']}.jpg"
+    global TOP_N_IMAGE_FEATURES
     img_features = (
         image_feature_extractor_func(
             img=img_path,
