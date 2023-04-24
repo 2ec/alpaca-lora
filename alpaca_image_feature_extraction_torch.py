@@ -66,6 +66,7 @@ def get_image_top_n_classes_faster_rcnn(
 
     labels_scores = []
 
+    print(f"\nType of prediction scores: \n{type(prediction['scores'])}\nPrediction Scores: \n{prediction['scores']}")
     for i, score in enumerate(prediction["scores"]):
         label = weights.meta["categories"][prediction["labels"][i]]
         xmin, ymin, xmax, ymax = prediction["boxes"][i].detach().tolist()
