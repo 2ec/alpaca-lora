@@ -276,9 +276,12 @@ def train(
 
 
 def generate_prompt(data_point, image_feature_extractor_func, img_encoder_structure):
+    global IMAGE_PATH
+    global IMAGE_MODEL
+    global TOP_N_IMAGE_FEATURES
     # sorry about the formatting disaster gotta move fast
     img_path = f"{IMAGE_PATH}/{data_point['input']}.jpg"
-    global TOP_N_IMAGE_FEATURES
+    
     img_features = (
         image_feature_extractor_func(
             img=img_path,
