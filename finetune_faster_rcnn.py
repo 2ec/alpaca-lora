@@ -19,7 +19,6 @@ from peft import (
 )
 from transformers import LlamaForCausalLM, LlamaTokenizer
 
-torch._dynamo.config.suppress_errors = True
 
 DATA_PATH = "ImageCLEFmed-MEDVQA-GI-2023-Development-Dataset/med_qa_imageid_without_not_relevant_20000_with_faster_rcnn_features_string.json"
 MAP_NUM_PROC = 1 #os.cpu_count() # Seems to not work on compute cluster per now.
