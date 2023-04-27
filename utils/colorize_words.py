@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 def colorize(words, color_array):
     # words is a list of words
     # color_array is an array of numbers between 0 and 1 of length equal to words
+    # https://gist.github.com/ihsgnef/f13c35cd46624c8f458a4d23589ac768
     cmap = matplotlib.colormaps.get_cmap('bwr')
     template = '<span class="barcode"; style="color: black; background-color: {}">{}</span>'
     colored_string = ''
