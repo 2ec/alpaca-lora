@@ -185,10 +185,11 @@ while True:
     print(f"\nResponse: {output_cleaned}")
     
     print(f"\nScores:\nType{type(scores)}\nShape: {scores.shape}\nScores: {scores}")
+    print(f"\nMean_value:", np.mean(scores))
 
     see_more = input("Do you want to see the whole output? y/n: ")
     if see_more == "y":
-        print(f"\nWhole output string:\n{generation_output}\n\ns:\n")
+        print(f"\nWhole output string:\n{generation_output}")
 
     want_lime = input("Do you want LIME? y/n: ")
     if want_lime == "y":
