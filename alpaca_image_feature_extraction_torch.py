@@ -101,6 +101,6 @@ if __name__ == "__main__":
     img = "ImageCLEFmed-MEDVQA-GI-2023-Development-Dataset/images/cl8k2u1pm1dw7083203g1b7yv.jpg"
 
     # Step 4: Use the model and print the predicted category
-    sorted_labels_scores = get_image_top_n_classes_faster_rcnn(img=img, model=model, top_n_features=50, weights=weights, from_path=True)
+    sorted_labels_scores = get_image_top_n_classes_faster_rcnn(img=img, model=model, top_n_features=NUM_TOP_CATEGORIES, weights=weights, from_path=True)
     for i in sorted_labels_scores:
         print(i)
