@@ -34,7 +34,7 @@ def train(
     num_epochs: int = 3,
     learning_rate: float = 3e-4,
     cutoff_len: int = 256,
-    val_set_size: int = 2000,
+    val_set_size: int = 6000,
     # lora hyperparams
     lora_r: int = 8,
     lora_alpha: int = 16,
@@ -224,8 +224,8 @@ def train(
             optim="adamw_torch",
             evaluation_strategy="steps" if val_set_size > 0 else "no",
             save_strategy="steps",
-            eval_steps=10 if val_set_size > 0 else None, # 200
-            save_steps=200, # 200
+            eval_steps=20 if val_set_size > 0 else None,  # 200
+            save_steps=20,  # 200
             do_eval=True,
             output_dir=output_dir,
             save_total_limit=3,
@@ -274,7 +274,7 @@ def generate_prompt(data_point):
 ### Response:
 {data_point["output"]}"""
     else:
-        return f"""Below is an instruction that describes a task. Write a response that appropriately completes the request.  # noqa: E501
+        return f"""Below is an instruction that describes a task. Write a response that appropriately completes the request.
 
 ### Instruction:
 {data_point["instruction"]}
