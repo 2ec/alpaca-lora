@@ -142,7 +142,7 @@ def evaluate(
     top_p=0.75,
     top_k=40,
     num_beams=4,
-    max_new_tokens=256,
+    max_new_tokens=128,
     **kwargs,
 ):
     prompt, img_features, correct_answer = generate_prompt(data_point)
