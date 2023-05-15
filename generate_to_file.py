@@ -19,9 +19,11 @@ tokenizer = LlamaTokenizer.from_pretrained("decapoda-research/llama-7b-hf")
 LOAD_8BIT = False
 BASE_MODEL = "decapoda-research/llama-7b-hf"
 LORA_WEIGHTS = input("\nPress enter for default weights or enter path: ")
-NEW_ANSWERED_FILE_PATH = input("\nGive relative path to save resulting json.\nIf nothing is inputed, 'results/med_qa_imageid_5000_test_answered.json' is chosen: ")
+NEW_ANSWERED_FILE_PATH = input(
+    "\nGive relative path to save resulting json.\nIf nothing is inputed, 'results/med_qa_imageid_5000_test_answered.json' is chosen: "
+)
 if not NEW_ANSWERED_FILE_PATH:
-    script_dir = os.path.dirname(__file__) #<-- absolute dir the script is in
+    script_dir = os.path.dirname(__file__)  # <-- absolute dir the script is in
     rel_path = "results/med_qa_imageid_5000_test_answered.json"
     NEW_ANSWERED_FILE_PATH = os.path.join(script_dir, rel_path)
 
@@ -31,7 +33,9 @@ IMAGE_MODEL = vgg16(weights=weights)
 IMAGE_MODEL.eval()
 TOP_N_IMAGE_FEATURES = 100
 
-DATA_PATH = input("\nGive relative path to save resulting json.\nIf nothing is inputed, 'ImageCLEFmed-MEDVQA-GI-2023-Development-Dataset/med_qa_imageid_without_not_relevant_5000_test.json' is chosen: ")
+DATA_PATH = input(
+    "\nGive relative path to save resulting json.\nIf nothing is inputed, 'ImageCLEFmed-MEDVQA-GI-2023-Development-Dataset/med_qa_imageid_without_not_relevant_5000_test.json' is chosen: "
+)
 if not DATA_PATH:
     DATA_PATH = "ImageCLEFmed-MEDVQA-GI-2023-Development-Dataset/med_qa_imageid_without_not_relevant_5000_test.json"
 IMAGE_PATH = "ImageCLEFmed-MEDVQA-GI-2023-Development-Dataset/images"
@@ -89,18 +93,16 @@ else:
 
 def generate_prompt(data_point, img_encoder_structure="(label, probability)"):
     # sorry about the formatting disaster gotta move fast
-    instruction, input = data_point["instruction"], data_point["input"]
-    
-    img_path = f"{IMAGE_PATH}/{data_point['input']}.jpg"
-    img_features = (
-        get_image_top_n_classes(
+    if "input" in data_point:
+        img_path = f"{IMAGE_PATH}/{data_point['input']}.jpg"
+        img_features = get_image_top_n_classes(
             img=img_path,
             model=IMAGE_MODEL,
             top_n_features=TOP_N_IMAGE_FEATURES,
             from_path=True,
         )
-    )
-    return f"""Below is a question that describes a task, paired with an input that provides image features from an encoded image. The form of the image features are {img_encoder_structure}. Write a response that appropriately completes the request.
+        return (
+            f"""Below is a question that describes a task, paired with an input that provides image features from an encoded image. The form of the image features are {img_encoder_structure}. Write a response that appropriately completes the request.
 
 ### Question:
 {data_point["instruction"]}
@@ -108,7 +110,22 @@ def generate_prompt(data_point, img_encoder_structure="(label, probability)"):
 ### Encoded image features on the form {img_encoder_structure}:
 {img_features}
 
-### Response:""", img_features, data_point["output"]
+### Response:""",
+            img_features,
+            data_point["output"],
+        )
+    else:
+        return (
+            f"""Below is an instruction that describes a task. Write a response that appropriately completes the request.
+
+### Instruction:
+{data_point["instruction"]}
+
+### Response:""",
+            None,
+            data_point["output"],
+        )
+
 
 if not LOAD_8BIT:
     model.half()  # seems to fix bugs for some users.
@@ -156,9 +173,8 @@ def main():
     def append_result(question_answer_list, file_path):
         with open(file_path, "a+") as f:
             for content_dict in question_answer_list:
-                fs = str(content_dict).replace("'",'"')
+                fs = str(content_dict).replace("'", '"')
                 f.write(f"\t{fs},\n")
-    
 
     with open(DATA_PATH, "r") as f:
         content = f.read()
@@ -169,16 +185,16 @@ def main():
 
     for question_answer in parsed:
         output, scores, img_features, answer = evaluate(question_answer)
-        output_cleaned = output.split('### Response:')[1].strip()
+        output_cleaned = output.split("### Response:")[1].strip()
         question_answer["output_answered"] = output_cleaned
-        question_answer["input"] = img_features
+        if "input" in question_answer:
+            question_answer["input"] = img_features
         question_answer_list.append(question_answer)
-        
+
         if len(question_answer_list) == 20:
             append_result(question_answer_list, NEW_ANSWERED_FILE_PATH)
             question_answer_list.clear()
 
-        
 
 if __name__ == "__main__":
     main()
