@@ -1,4 +1,11 @@
-# 🦙🌲🤏 Alpaca-LoRA
+# Alpaca-VQA
+
+The code in this repo is used for a Masters thesis exploring how black-box models can be interpreted by explanatory post-hoc models.
+The thesis can be found [here](https://github.com/2ec/UiO_Master_Thesis).
+
+---
+
+# 🦙🌲🤏 Original Alpaca-LoRA
 
 - 🤗 **Try the pretrained model out [here](https://huggingface.co/spaces/tloen/alpaca-lora), courtesy of a GPU grant from Huggingface!**
 - Users have created a Discord server for discussion and support [here](https://discord.gg/prbq284xX5)
